@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr" data-lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>闇の日誌 | Dark Journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Naskh+Arabic:wght@400;600&family=Noto+Serif+Devanagari:wght@300;400;600&family=Noto+Serif+Bengali:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:    #050403;
+      --panel:    #13110e;
+      --border:   #2a2318;
+      --gold:     #c8a96e;
+      --gold-dim: #7a6440;
+      --ivory:    #e8dfc8;
+      --muted:    #7a7060;
+      --ember:    #d4622a;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--black);
+      color: var(--ivory);
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 300;
+      line-height: 1.8;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    #ember-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; }
+    .page-bg { position: fixed; inset: 0; z-index: 1; background-image: linear-gradient(rgba(5,4,3,0.58),rgba(5,4,3,0.58)), url('images/Tomo.png'); background-size: cover; background-position: center; pointer-events: none; }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1; opacity: 0.4;
+    }
+    .site-wrapper { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Ornament ── */
+    .ornament { display: flex; align-items: center; gap: 12px; color: var(--gold-dim); font-size: 0.7rem; letter-spacing: 0.3em; margin: 40px 0; }
+    .ornament::before, .ornament::after { content: ''; flex: 1; height: 1px; }
+    .ornament::before { background: linear-gradient(to right, transparent, var(--gold-dim)); }
+    .ornament::after  { background: linear-gradient(to left,  transparent, var(--gold-dim)); }
+
+    /* ── Header ── */
+    header { border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(5,4,3,0.94); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 200; }
+    .header-inner { max-width: 900px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 20px; }
+    .site-logo { font-family: 'Cinzel', serif; font-weight: 900; font-size: 22px; color: var(--gold); letter-spacing: 0.08em; text-decoration: none; text-transform: uppercase; white-space: nowrap; flex: 1; }
+    .site-logo span { color: var(--ember); }
+    nav ul { list-style: none; display: flex; gap: 28px; }
+    nav a { color: var(--muted); text-decoration: none; font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase; transition: color 0.3s; }
+    nav a:hover { color: var(--gold); }
+
+
+/* ── Language Picker ── */
+    .lang-picker { position: relative; flex-shrink: 0; }
+    .lang-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); font-family: 'Cinzel', serif;
+      font-size: 0.65rem; letter-spacing: 0.18em;
+      padding: 7px 11px; cursor: pointer;
+      transition: border-color 0.3s, color 0.3s; white-space: nowrap;
+    }
+    .lang-btn:hover, .lang-picker.open .lang-btn { border-color: var(--gold-dim); color: var(--gold); }
+    .lang-btn svg { transition: transform 0.3s; flex-shrink: 0; }
+    .lang-picker.open .lang-btn svg { transform: rotate(180deg); }
+    .lang-dropdown {
+      display: none; position: absolute; top: calc(100% + 6px); right: 0;
+      background: #0d0b09; border: 1px solid var(--border);
+      list-style: none; min-width: 168px; z-index: 400;
+      max-height: 340px; overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    }
+    .lang-picker.open .lang-dropdown { display: block; }
+    .lang-dropdown li {
+      padding: 11px 16px; font-size: 0.82rem; color: var(--muted);
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Noto Serif JP','Noto Naskh Arabic','Noto Serif Devanagari','Noto Serif Bengali',serif;
+    }
+    .lang-dropdown li:hover, .lang-dropdown li:active { background: var(--panel); color: var(--ivory); }
+    .lang-dropdown li.active { color: var(--gold); }
+
+    /* ── Hamburger ── */
+    .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 36px; height: 36px; background: none; border: none; cursor: pointer; padding: 4px; z-index: 210; flex-shrink: 0; }
+    .hamburger span { display: block; width: 100%; height: 1px; background: var(--gold-dim); transition: transform 0.3s, opacity 0.3s, background 0.3s; transform-origin: center; }
+    .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); background: var(--gold); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); background: var(--gold); }
+
+    /* ── Mobile Drawer ── */
+    .mobile-nav { display: none; position: fixed; inset: 0; background: rgba(5,4,3,0.97); z-index: 190; flex-direction: column; align-items: center; justify-content: center; gap: 40px; opacity: 0; transition: opacity 0.3s; }
+    .mobile-nav.open { opacity: 1; }
+    .mobile-nav a { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.3s; }
+    .mobile-nav a:hover { color: var(--gold); }
+
+    /* ── Hero ── */
+    .hero { min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px 16px; position: relative; }
+    .hero-subtitle { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.5em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 24px; }
+    .hero-title { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(2rem, 7vw, 4rem); color: var(--ivory); letter-spacing: 0.05em; line-height: 1.2; text-shadow: 0 0 60px rgba(200,169,110,0.2); margin-bottom: 12px; }
+    .hero-title em { font-style: normal; color: var(--gold); }
+    .hero-jp { font-size: clamp(0.9rem, 2.5vw, 1.4rem); color: var(--muted); font-weight: 300; letter-spacing: 0.15em; margin-bottom: 36px; }
+    .hero-desc { max-width: 520px; font-size: 16px; color: var(--muted); line-height: 2; margin-bottom: 48px; }
+    .hero-cta { display: inline-block; border: 1px solid var(--gold-dim); color: var(--gold); font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; padding: 16px 40px; transition: all 0.4s; position: relative; overflow: hidden; }
+    .hero-cta::before { content: ''; position: absolute; inset: 0; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; z-index: -1; }
+    .hero-cta:hover { color: var(--black); }
+    .hero-cta:hover::before { transform: scaleX(1); }
+    .scroll-hint { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--gold-dim); font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; animation: float 2s ease-in-out infinite; }
+    .scroll-hint::after { content: ''; width: 1px; height: 36px; background: linear-gradient(to bottom, var(--gold-dim), transparent); }
+    @keyframes float { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+
+    /* ── Sections ── */
+    .section-label { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.5em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 8px; }
+    .section-title { font-family: 'Cinzel', serif; font-weight: 600; font-size: clamp(1.3rem, 3vw, 1.6rem); color: var(--ivory); letter-spacing: 0.1em; margin-bottom: 40px; }
+    #posts { padding: 60px 0; }
+    .posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .post-card { background: var(--panel); border: 1px solid var(--border); padding: 28px 24px; display: flex; flex-direction: column; gap: 12px; transition: border-color 0.3s, background 0.3s; text-decoration: none; color: inherit; -webkit-tap-highlight-color: transparent; }
+    .post-card:hover, .post-card:active { border-color: var(--gold-dim); background: #161310; }
+    .post-card.featured { grid-column: 1 / -1; }
+    .post-meta { display: flex; align-items: center; gap: 10px; font-size: 16px; letter-spacing: 0.2em; color: var(--gold-dim); font-family: 'Cinzel', serif; text-transform: uppercase; flex-wrap: wrap; }
+    .post-meta span:not(.post-tag) { font-size: 22px; }
+    .post-tag { background: rgba(200,169,110,0.1); border: 1px solid var(--gold-dim); color: var(--gold-dim); padding: 2px 8px; font-size: 16px; letter-spacing: 0.2em; }
+    .post-title { font-family: 'Noto Serif JP', serif; font-weight: 600; font-size: clamp(0.95rem, 2vw, 1.05rem); color: var(--ivory); line-height: 1.6; }
+    .post-card.featured .post-title { font-size: clamp(1.1rem, 3vw, 1.4rem); }
+    .post-excerpt { font-size: 16px; color: var(--muted); line-height: 1.9; }
+    .post-arrow { font-family: 'Cinzel', serif; font-size: 16px; color: var(--gold-dim); letter-spacing: 0.2em; margin-top: auto; padding-top: 8px; transition: color 0.3s; }
+    .post-card:hover .post-arrow { color: var(--gold); }
+
+    /* ── Tomoshibi ── */
+    #tomoshibi { display: block; padding: 0; height: 800vh; position: relative; z-index: 2; }
+    .tomo-viewport { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+    .tomo-bg { position: absolute; inset: -6%; background-size: cover; background-position: center; opacity: 0; transform: scale(1); transition: opacity 1.4s ease, filter 1.4s ease, transform 1.4s ease; filter: blur(0px); }
+    .tomo-bg.active { opacity: 1; filter: blur(0px); transform: scale(1); }
+    .tomo-bg.exiting { opacity: 0; filter: blur(22px); transform: scale(1.04); }
+    .tomo-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, rgba(5,4,3,0.5) 0%, rgba(5,4,3,0.07) 35%, rgba(5,4,3,0.07) 52%, rgba(5,4,3,0.7) 72%, rgba(5,4,3,0.97) 100%); }
+    .tomo-content { position: absolute; z-index: 2; bottom: 80px; left: 0; right: 0; padding: 0 32px; text-align: center; opacity: 0; display: none; will-change: transform, opacity; }
+    .tomo-lead { font-family: 'Noto Serif JP', serif; font-size: 20pt; font-weight: 700; color: var(--gold); letter-spacing: 0.12em; line-height: 1.9; margin: 0 0 1.2em; }
+    .tomo-body { font-family: 'Noto Serif JP', serif; font-size: 16pt; color: var(--ivory); line-height: 2.4; letter-spacing: 0.04em; opacity: 0.88; margin: 0; }
+
+    /* ── Footer ── */
+    footer { border-top: 1px solid var(--border); padding: 48px 0; text-align: center; }
+    .footer-logo { font-family: 'Cinzel', serif; font-weight: 900; font-size: 22px; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 20px; }
+    .footer-logo-span { color: var(--ember); }
+    .footer-copy { font-size: 16px; color: var(--ivory); letter-spacing: 0.2em; font-family: 'Cinzel', serif; text-transform: uppercase; }
+
+    /* ── Reveal ── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Article Modal ── */
+    .article-modal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+    .article-modal.open { opacity: 1; pointer-events: all; }
+    .article-modal-bg { position: absolute; inset: 0; background: rgba(5,4,3,0.93); }
+    .article-modal-box { position: relative; z-index: 1; max-width: 680px; width: 90%; max-height: 82vh; overflow-y: auto; background: var(--panel); border: 1px solid var(--border); padding: 56px 48px 48px; transform: translateY(24px); transition: transform 0.4s ease; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    .article-modal.open .article-modal-box { transform: translateY(0); }
+    .article-modal-close { position: absolute; top: 18px; right: 24px; background: none; border: none; color: var(--gold-dim); font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.25em; cursor: pointer; padding: 6px; transition: color 0.3s; }
+    .article-modal-close:hover { color: var(--gold); }
+    .article-modal-meta { display: flex; align-items: center; gap: 10px; font-size: 13px; letter-spacing: 0.2em; color: var(--gold-dim); font-family: 'Cinzel', serif; margin-bottom: 24px; flex-wrap: wrap; }
+    .article-modal-tag { background: rgba(200,169,110,0.1); border: 1px solid var(--gold-dim); padding: 2px 8px; }
+    .article-modal-title { font-family: 'Noto Serif JP', serif; font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: 0.06em; line-height: 1.7; margin-bottom: 36px; border-bottom: 1px solid var(--border); padding-bottom: 28px; }
+    .article-modal-body { font-family: 'Noto Serif JP', serif; font-size: 16px; color: var(--ivory); line-height: 2.6; letter-spacing: 0.04em; white-space: pre-line; opacity: 0.9; }
+    .article-modal-img { width: 100%; max-height: 420px; object-fit: cover; display: block; margin: 32px 0; border: 1px solid var(--border); }
+
+    /* ════ RTL (Arabic) ════ */
+    [data-lang="ar"] { direction: rtl; }
+    [data-lang="ar"] .lang-dropdown { right: auto; left: 0; }
+    [data-lang="ar"] .hero-cta::before { transform-origin: right; }
+    [data-lang="ar"] .ornament::before { background: linear-gradient(to left,  transparent, var(--gold-dim)); }
+    [data-lang="ar"] .ornament::after  { background: linear-gradient(to right, transparent, var(--gold-dim)); }
+
+    /* ════ Non-Latin Font Overrides ════ */
+    [data-lang="hi"] { font-family: 'Noto Serif Devanagari', serif; }
+    [data-lang="hi"] .hero-title,
+    [data-lang="hi"] .section-title,
+    [data-lang="hi"] .section-label,
+    [data-lang="hi"] nav a,
+    [data-lang="hi"] .mobile-nav a,
+    [data-lang="hi"] .hero-cta,
+    [data-lang="hi"] .hero-subtitle,
+    [data-lang="hi"] .post-arrow,
+    [data-lang="hi"] .about-link,
+    [data-lang="hi"] .footer-logo,
+    [data-lang="hi"] .footer-copy { font-family: 'Noto Serif Devanagari', serif; letter-spacing: 0.02em; }
+    [data-lang="hi"] .post-title { font-family: 'Noto Serif Devanagari', serif; }
+
+    [data-lang="ar"] { font-family: 'Noto Naskh Arabic', serif; }
+    [data-lang="ar"] .hero-title,
+    [data-lang="ar"] .section-title,
+    [data-lang="ar"] .section-label,
+    [data-lang="ar"] nav a,
+    [data-lang="ar"] .mobile-nav a,
+    [data-lang="ar"] .hero-cta,
+    [data-lang="ar"] .hero-subtitle,
+    [data-lang="ar"] .post-arrow,
+    [data-lang="ar"] .about-link,
+    [data-lang="ar"] .footer-logo,
+    [data-lang="ar"] .footer-copy { font-family: 'Noto Naskh Arabic', serif; letter-spacing: 0; }
+    [data-lang="ar"] .post-title { font-family: 'Noto Naskh Arabic', serif; }
+
+    [data-lang="bn"] { font-family: 'Noto Serif Bengali', serif; }
+    [data-lang="bn"] .hero-title,
+    [data-lang="bn"] .section-title,
+    [data-lang="bn"] .section-label,
+    [data-lang="bn"] nav a,
+    [data-lang="bn"] .mobile-nav a,
+    [data-lang="bn"] .hero-cta,
+    [data-lang="bn"] .hero-subtitle,
+    [data-lang="bn"] .post-arrow,
+    [data-lang="bn"] .about-link,
+    [data-lang="bn"] .footer-logo,
+    [data-lang="bn"] .footer-copy { font-family: 'Noto Serif Bengali', serif; letter-spacing: 0.02em; }
+    [data-lang="bn"] .post-title { font-family: 'Noto Serif Bengali', serif; }
+
+    /* ════ Tablet 641–1024px ════ */
+    @media (max-width: 1024px) and (min-width: 641px) {
+      .site-wrapper { padding: 0 32px; }
+      .header-inner { padding: 16px 32px; }
+      .tomo-content { bottom: 72px; padding: 0 32px; }
+    }
+
+    /* ════ Mobile ≤640px ════ */
+    @media (max-width: 640px) {
+      .hamburger { display: flex; }
+      header nav { display: none; }
+      .mobile-nav { display: flex; }
+      .site-wrapper { padding: 0 16px; }
+      .header-inner { padding: 13px 16px; gap: 12px; }
+.site-logo { font-size: clamp(0.52rem, 3.2vw, 0.75rem); }
+      .hero { min-height: 80vh; padding: 60px 8px 72px; }
+      .hero-desc { display: none; }
+      .posts-grid { grid-template-columns: 1fr; }
+      .post-card.featured { grid-column: auto; }
+      .post-card { padding: 24px 20px; }
+      #posts { padding: 48px 0; }
+      .tomo-content { bottom: 56px; padding: 0 20px; }
+      .ornament { margin: 28px 0; }
+      footer { padding: 36px 0; }
+      .lang-btn { padding: 6px 9px; font-size: 0.6rem; }
+    }
+    @media (max-width: 380px) {
+      .hero-title { font-size: 1.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="ember-canvas"></canvas>
+<div class="page-bg"></div>
+
+<!-- Mobile drawer -->
+<nav class="mobile-nav" id="mobile-nav" aria-hidden="true">
+  <a href="#posts"      data-i18n="nav-posts"      onclick="closeMenu()">刻印物</a>
+  <a href="#works"      data-i18n="nav-works"      onclick="closeMenu()">創作物</a>
+  <a href="#tomoshibi" data-i18n="nav-tomoshibi"  onclick="closeMenu()">灯火</a>
+</nav>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a href="#" class="site-logo">Bring light into<span>&nbsp;the darkness</span></a>
+
+    <nav aria-label="main">
+      <ul>
+        <li><a href="#posts"      data-i18n="nav-posts">刻印物</a></li>
+        <li><a href="#works"      data-i18n="nav-works">創作物</a></li>
+        <li><a href="#tomoshibi" data-i18n="nav-tomoshibi">灯火</a></li>
+      </ul>
+    </nav>
+
+    <!-- Language picker -->
+    <div class="lang-picker" id="lang-picker">
+      <button class="lang-btn" id="lang-btn" aria-expanded="false" aria-haspopup="listbox">
+        <span id="lang-current">JA</span>
+        <svg width="8" height="5" viewBox="0 0 8 5" fill="none"><path d="M0 0L4 5L8 0" stroke="currentColor" stroke-width="1.2"/></svg>
+      </button>
+      <ul class="lang-dropdown" id="lang-dropdown" role="listbox">
+        <li role="option" data-lang="ja"  class="active">日本語</li>
+        <li role="option" data-lang="en">English</li>
+        <li role="option" data-lang="fr">Français</li>
+        <li role="option" data-lang="es">Español</li>
+        <li role="option" data-lang="pt">Português</li>
+        <li role="option" data-lang="hi">हिन्दी</li>
+        <li role="option" data-lang="ar">العربية</li>
+        <li role="option" data-lang="bn">বাংলা</li>
+        <li role="option" data-lang="ru">Русский</li>
+        <li role="option" data-lang="id">Indonesia</li>
+        <li role="option" data-lang="de">Deutsch</li>
+        <li role="option" data-lang="pl">Polski</li>
+        <li role="option" data-lang="ko">한국어</li>
+        <li role="option" data-lang="zh">北京語</li>
+        <li role="option" data-lang="yue">廣東語</li>
+      </ul>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+</header>
+
+<!-- Main -->
+<div class="site-wrapper">
+
+  <section class="hero">
+
+    <h1 class="hero-title" data-i18n-html="hero-title">闇の中に<br /><em>光を灯す</em></h1>
+    <p class="hero-jp" data-i18n="hero-jp">日々の思索の刻印</p>
+    <p class="hero-desc" data-i18n="hero-desc">これは私が刻む、旅の手記、思索の断片——</p>
+    <a href="#posts" class="hero-cta" data-i18n="hero-cta">記事を読む</a>
+
+  </section>
+
+  <section id="posts">
+
+    <h2 class="section-title reveal" data-i18n="posts-title">最新の記録</h2>
+    <div class="posts-grid">
+
+      <a href="javascript:void(0)" class="post-card featured reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-1">体感記</span>
+          <span>2025.05.21</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-1">空気の匂いが、夏に変わった</h3>
+        <p class="post-excerpt" data-i18n="excerpt-1">葉っぱの匂い？緑の匂い？土の匂い？うまい表現が見つからなくて毎年もどかしい。でも毎年必ず気づく——この瞬間を。これから暑くなるのか、と。暑さよ、お手柔らかに頼む。お前とは喧嘩したくないんだよ。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-2">体感記</span>
+          <span>2025.11.12</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-2">夜の空気が、冬の匂いに変わった</h3>
+        <p class="post-excerpt" data-i18n="excerpt-2">夜、外の空気の匂いが冬に変わった。冬の空気の匂いって何だ？って話だが、これもうまく説明できない。夏の青臭さが急に抜けた様な、空気そのものが急に乾いた様な——相変わらず語彙力の無さに、我ながら脱力。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-3">体感記</span>
+          <span>2025.03.19</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-3">3月に、雪が積もった</h3>
+        <p class="post-excerpt" data-i18n="excerpt-3">少し前に「そろそろ春かな」と書いたばかりだが、今日はなんと積雪5センチ以上。雪よ、スキー場に降ってあげなさい。厚手で出かけると暑くて汗ばむ、脱ぐ、手で持つ——これがとてつもなく面倒くさい。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-4">体感記</span>
+          <span>2025.08.16</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-4">日が短くなった</h3>
+        <p class="post-excerpt" data-i18n="excerpt-4">8月16日。一昨日あたりから、日が短くなったかもしれないと思った。まだ真夏の暑さの中で、ふと気づく変化。体感は、カレンダーよりも正直に季節を知っている。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-5">体感記</span>
+          <span>2025.10.29</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-5">街が、冬の支度をしていた</h3>
+        <p class="post-excerpt" data-i18n="excerpt-5">10月29日。外はガチで寒かった。街を歩くと、みんないつの間にか厚手の服に変わっていた。毎年この季節が来るたびに思う——嬉しく、寂しい</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-6">体感記</span>
+          <span>2025.08.10</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-6">PCでゲームをやったら、動いた</h3>
+        <p class="post-excerpt" data-i18n="excerpt-6">夜、初めてPCでゲームをやった。古いから動くわけないと決めつけていたが——スペックがギリ行けると判明。意外としっかり動く。驚き。新たな発見だが、基本ゲームは専用ハードでやる。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-7">体感記</span>
+          <span>2025.08.24</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-7">関東から東北へ</h3>
+        <p class="post-excerpt" data-i18n="excerpt-7">関東から東北の中腹まで、ちんたら走りながら帰省。寄り道しながらが正解なんだよ。途中で「ありがたい名前の温泉」を見つけて立ち寄る。設備は古いがお湯は良し。温泉はお湯で判断するもの——だよね？</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-8">体感記</span>
+          <span>2025.12.29</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-8">年末の買い出し、イモ洗い状態</h3>
+        <p class="post-excerpt" data-i18n="excerpt-8">年末の買い出し日——これも一大行事。道は混むわ、店は混むわ、イモ洗い状態。気温14℃、昼間は暖かかった。それだけが救いだった。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-9">体感記</span>
+          <span>2026.03.10</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-9">東北往復から三峰山</h3>
+        <p class="post-excerpt" data-i18n="excerpt-9">3月8日-9日、東北関東の往復。寒くて雪が降っていた。翌10日は三峰山へ朝一から。車に雪が残っていて、山にも積雪。夜帰宅しても、まだ冬だった。3月は、冬と春が戦っている月だ。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-10">体感記</span>
+          <span>2026.03.29</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-10">初の20℃超え、花見日和</h3>
+        <p class="post-excerpt" data-i18n="excerpt-10">3月29日、今年初めての20℃超え。22℃。花見日和とはこの日のためにある言葉だ。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+      <a href="javascript:void(0)" class="post-card reveal">
+        <div class="post-meta">
+          <span class="post-tag" data-i18n="tag-11">体感記</span>
+          <span>2026.04.22</span>
+        </div>
+        <h3 class="post-title" data-i18n="title-11">つつじ園</h3>
+        <p class="post-excerpt" data-i18n="excerpt-11">4月22日。つつじ園へ。</p>
+        <span class="post-arrow" data-i18n="read-more">Read more →</span>
+      </a>
+
+    </div>
+  </section>
+
+</div><!-- /site-wrapper -->
+
+<div class="article-modal" id="article-modal">
+  <div class="article-modal-bg" id="modal-bg"></div>
+  <div class="article-modal-box">
+    <button class="article-modal-close" id="modal-close">CLOSE ✕</button>
+    <div class="article-modal-meta">
+      <span class="article-modal-tag" id="modal-tag"></span>
+      <span id="modal-date"></span>
+    </div>
+    <h2 class="article-modal-title" id="modal-title"></h2>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<section id="tomoshibi">
+  <div class="tomo-viewport">
+    <div class="tomo-bg" style="background-image:url('images/OP1.png')"></div>
+    <div class="tomo-bg" style="background-image:url('images/OP2.png')"></div>
+    <div class="tomo-bg" style="background-image:url('images/OP3.png')"></div>
+    <div class="tomo-bg" style="background-image:url('images/OP4.png')"></div>
+    <div class="tomo-bg" style="background-image:url('images/Tomosibi.png')"></div>
+    <div class="tomo-overlay"></div>
+    <div class="tomo-content">
+      <p class="tomo-lead" data-i18n="tomo-lead-1">此処の手記の刻印者、灯火（ともしび）と申します</p>
+      <p class="tomo-body" data-i18n="tomo-body-1">この暗闇の先で、何かを探しているのなら——</p>
+    </div>
+    <div class="tomo-content">
+      <p class="tomo-lead" data-i18n="tomo-lead-2">暗闇を、ずっと恐れていた</p>
+      <p class="tomo-body" data-i18n-html="tomo-body-2">夜が怖かった。光が消えると、世界が違う顔を見せる気がして<br>けれど今は知っている。暗闇の中にしか、見えないものがある</p>
+    </div>
+    <div class="tomo-content">
+      <p class="tomo-lead" data-i18n="tomo-lead-3">星は、夜空にしか輝かない</p>
+      <p class="tomo-body" data-i18n-html="tomo-body-3">この手記は私の痕跡だ。旅のこと、本のこと、ふとした夜中の思考のかけら<br>美しいと感じた瞬間を、言葉で捕まえようとする試み</p>
+    </div>
+    <div class="tomo-content">
+      <p class="tomo-lead" data-i18n="tomo-lead-4">完璧には程遠い。でも、だからこそ本物だと思っている</p>
+      <p class="tomo-body" data-i18n-html="tomo-body-4">暗闇の中で灯す火は、小さくていい<br>それでも、誰かの目に届くならば</p>
+    </div>
+    <div class="tomo-content"></div>
+  </div>
+</section>
+
+<div class="site-wrapper">
+  <footer>
+    <p class="footer-logo">Bring light into<span class="footer-logo-span">&nbsp;the darkness</span></p>
+    <div class="ornament" style="margin:16px 0">✦</div>
+    <p class="footer-copy" data-i18n="footer-copy">&copy; 灯火 2026</p>
+  </footer>
+</div>
+
+<script>
+/* ── Translations ── */
+const t = {
+  ja: {
+    'nav-posts':'刻印物','nav-works':'創作物','nav-tomoshibi':'灯火',
+    'hero-subtitle':'— Personal Chronicle —',
+    'hero-title':'闇の中に<br /><em>光を灯す</em>',
+    'hero-jp':'日々の思索の刻印',
+    'hero-desc':'これは私が刻む、旅の手記、思索の断片——',
+    'hero-cta':'記事を読む','scroll':'Scroll',
+    'posts-label':'— Chronicle —','posts-title':'最新の記録',
+    'tag-1':'体感記','title-1':'空気の匂いが、夏に変わった',
+    'excerpt-1':'葉っぱの匂い？緑の匂い？土の匂い？うまい表現が見つからなくて毎年もどかしい。でも毎年必ず気づく——この瞬間を。これから暑くなるのか、と。暑さよ、お手柔らかに頼む。お前とは喧嘩したくないんだよ。',
+    'tag-2':'体感記','title-2':'夜の空気が、冬の匂いに変わった',
+    'excerpt-2':'夜、外の空気の匂いが冬に変わった。冬の空気の匂いって何だ？って話だが、これもうまく説明できない。夏の青臭さが急に抜けた様な、空気そのものが急に乾いた様な——相変わらず語彙力の無さに、我ながら脱力。',
+    'tag-3':'体感記','title-3':'3月に、雪が積もった',
+    'excerpt-3':'少し前に「そろそろ春かな」と書いたばかりだが、今日はなんと積雪5センチ以上。雪よ、スキー場に降ってあげなさい。厚手で出かけると暑くて汗ばむ、脱ぐ、手で持つ——これがとてつもなく面倒くさい。',
+    'tag-4':'体感記','title-4':'日が短くなった',
+    'excerpt-4':'8月16日。一昨日あたりから、日が短くなったかもしれないと思った。まだ真夏の暑さの中で、ふと気づく変化。体感は、カレンダーよりも正直に季節を知っている。',
+    'tag-5':'体感記','title-5':'街が、冬の支度をしていた',
+    'excerpt-5':'10月29日。外はガチで寒かった。街を歩くと、みんないつの間にか厚手の服に変わっていた。毎年この季節が来るたびに思う——嬉しく、寂しい',
+    'tag-6':'体感記','title-6':'PCでゲームをやったら、動いた',
+    'excerpt-6':'夜、初めてPCでゲームをやった。古いから動くわけないと決めつけていたが——スペックがギリ行けると判明。意外としっかり動く。驚き。新たな発見だが、基本ゲームは専用ハードでやる。',
+    'tag-7':'体感記','title-7':'関東から東北へ',
+    'excerpt-7':'関東から東北の中腹まで、ちんたら走りながら帰省。寄り道しながらが正解なんだよ。途中で「ありがたい名前の温泉」を見つけて立ち寄る。設備は古いがお湯は良し。温泉はお湯で判断するもの——だよね？',
+    'tag-8':'体感記','title-8':'年末の買い出し、イモ洗い状態',
+    'excerpt-8':'年末の買い出し日——これも一大行事。道は混むわ、店は混むわ、イモ洗い状態。気温14℃、昼間は暖かかった。それだけが救いだった。',
+    'tag-9':'体感記','title-9':'東北往復から三峰山',
+    'excerpt-9':'3月8日-9日、東北関東の往復。寒くて雪が降っていた。翌10日は三峰山へ朝一から。車に雪が残っていて、山にも積雪。夜帰宅しても、まだ冬だった。3月は、冬と春が戦っている月だ。',
+    'tag-10':'体感記','title-10':'初の20℃超え、花見日和',
+    'excerpt-10':'3月29日、今年初めての20℃超え。22℃。花見日和とはこの日のためにある言葉だ。',
+    'tag-11':'体感記','title-11':'つつじ園',
+    'excerpt-11':'4月22日。つつじ園へ。',
+    'read-more':'Read more →',
+    'tomoshibi-label':'— 灯火 —','tomoshibi-body':'暗闇を、ずっと恐れていた。<br /><br />子供の頃、夜が怖かった。光が消えると、世界が違う顔を見せる気がして。<br />けれど今は知っている。暗闇の中にしか、見えないものがある。<br /><br />星は、夜空にしか輝かない。<br /><br />この手記は私の痕跡だ。旅のこと、本のこと、ふとした夜中の思考のかけら。<br />美しいと感じた瞬間を、言葉で捕まえようとする試み。<br /><br />完璧には程遠い。でも、だからこそ本物だと思っている。<br /><br />暗闇の中で灯す火は、小さくていい。<br />それでも、誰かの目に届くならば。',
+    'tomo-lead-1':'此処の手記の刻印者、灯火（ともしび）と申します',
+    'tomo-body-1':'この暗闇の先で、何かを探しているのなら——',
+    'tomo-lead-2':'暗闇を、ずっと恐れていた',
+    'tomo-body-2':'夜が怖かった。光が消えると、世界が違う顔を見せる気がして<br>けれど今は知っている。暗闇の中にしか、見えないものがある',
+    'tomo-lead-3':'星は、夜空にしか輝かない',
+    'tomo-body-3':'この手記は私の痕跡だ。旅のこと、本のこと、ふとした夜中の思考のかけら<br>美しいと感じた瞬間を、言葉で捕まえようとする試み',
+    'tomo-lead-4':'完璧には程遠い。でも、だからこそ本物だと思っている',
+    'tomo-body-4':'暗闇の中で灯す火は、小さくていい<br>それでも、誰かの目に届くならば',
+    'footer-copy':'© 灯火 2026',
+  },
+  en: {
+    'nav-posts':'Posts','nav-works':'Works','nav-tomoshibi':'Tomoshibi',
+    'hero-subtitle':'— Personal Chronicle —',
+    'hero-title':'In the Dark,<br /><em>Lighting a Flame</em>',
+    'hero-jp':'Thoughts & Records of Daily Life',
+    'hero-desc':'This is my personal journal — records of travels, fragments of thought, and the beautiful things I encounter each day.',
+    'hero-cta':'Read Posts','scroll':'Scroll',
+    'posts-label':'— Chronicle —','posts-title':'Latest Records',
+    'tag-1':'Essay','title-1':'Only in Silence Can the True Voice Be Heard',
+    'excerpt-1':'Late at night, far from the noise, staring into the darkness outside my window — I realized we constantly fill ourselves with sound. Is it not in those silent gaps where the purest thoughts dwell?',
+    'tag-2':'Daily','title-2':'How to Spend a Rainy Day, and Books I Love',
+    'excerpt-2':'A day spent dismantling the reading pile, with rain as the backdrop. Notes on an afternoon where coffee and old books mingled.',
+    'tag-3':'Thought','title-3':'The Aesthetics of Imperfection — On Wabi-Sabi',
+    'excerpt-3':'Wholeness found within what is broken. The philosophy Japan discovered long ago continues to resonate deeply in the modern world.',
+    'tag-4':'Travel','title-4':'What I Felt at a Kyoto Shrine on a Night Visit',
+    'excerpt-4':'The temple grounds after the tourists had gone. Only the lantern flames swayed — I felt as if I were standing just outside of time.',
+    'excerpt-5':'October 29th. It was seriously cold outside. Walking through town, everyone had switched to heavy coats without my noticing. Every year when this season arrives, I think the same thing — glad, and sad.',
+    'read-more':'Read more →',
+    'footer-copy':'© Tomoshibi 2026 — All rights reserved',
+    'tomo-lead-1':'I am Tomoshibi, the one who inscribes this journal',
+    'tomo-body-1':'If you are searching for something beyond the darkness——',
+    'tomo-lead-2':'I was always afraid of the dark',
+    'tomo-body-2':'I feared the night. When the light went out, the world seemed to show a different face.<br>But now I know. There are things that can only be seen within the darkness.',
+    'tomo-lead-3':'Stars only shine in the night sky',
+    'tomo-body-3':'This journal is my trace. Fragments of travel, books, stray thoughts in the middle of the night.<br>An attempt to capture in words the moments I found beautiful.',
+    'tomo-lead-4':'Far from perfect. But that is exactly why I believe it is real.',
+    'tomo-body-4':'The flame lit in the darkness can be small.<br>Even so, if it reaches someone\'s eyes——',
+  },
+  fr: {
+    'nav-posts':'Articles','nav-works':'Œuvres','nav-tomoshibi':'Lumière',
+    'hero-subtitle':'— Chronique Personnelle —',
+    'hero-title':"Dans l'Obscurité,<br /><em>Allumer une Flamme</em>",
+    'hero-jp':'Pensées et récits du quotidien',
+    'hero-desc':'Voici mon journal personnel — récits de voyages, fragments de pensée et belles rencontres du quotidien.',
+    'hero-cta':'Lire les articles','scroll':'Défiler',
+    'posts-label':'— Chronique —','posts-title':'Derniers écrits',
+    'tag-1':'Essai','title-1':"Ce n'est que dans le silence que la vraie voix se fait entendre",
+    'excerpt-1':"Au cœur de la nuit, loin du bruit, j'ai réalisé que nous cherchons sans cesse à remplir le silence. N'est-ce pas dans ces interstices que naissent les pensées les plus pures ?",
+    'tag-2':'Quotidien','title-2':'Comment passer un jour de pluie et mes livres préférés',
+    'excerpt-2':"Une journée à rattraper les livres en attente, bercée par la pluie. Notes d'un après-midi où café et vieux livres se mêlaient.",
+    'tag-3':'Réflexion','title-3':'L\'esthétique de l\'imparfait — sur le Wabi-Sabi',
+    'excerpt-3':'La complétude trouvée dans ce qui est brisé. La philosophie découverte jadis au Japon résonne encore profondément dans le monde moderne.',
+    'tag-4':'Voyage','title-4':'Ce que j\'ai ressenti dans un sanctuaire de Kyoto la nuit',
+    'excerpt-4':"L'enceinte du temple après le départ des touristes. Seules les flammes des lanternes oscillaient — j'avais l'impression d'être en dehors du temps.",
+    'excerpt-5':"29 octobre. Il faisait vraiment froid dehors. En se promenant en ville, tout le monde avait silencieusement troqué ses vêtements légers pour des manteaux chauds. Chaque année quand cette saison revient, je pense la même chose — heureux, et triste.",
+    'read-more':'Lire la suite →',
+    'tomo-lead-1':'Je suis Tomoshibi, celui qui inscrit ce journal',
+    'tomo-body-1':"Si vous cherchez quelque chose au-delà de l'obscurité——",
+    'tomo-lead-2':"J'ai toujours eu peur de l'obscurité",
+    'tomo-body-2':"Je craignais la nuit. Quand la lumière s'éteignait, le monde semblait montrer un autre visage.<br>Mais aujourd'hui je sais. Il y a des choses qu'on ne peut voir que dans l'obscurité.",
+    'tomo-lead-3':'Les étoiles ne brillent que dans le ciel nocturne',
+    'tomo-body-3':'Ce journal est ma trace. Des fragments de voyages, de lectures, de pensées vagabondes au milieu de la nuit.<br>Une tentative de capturer en mots les instants qui m\'ont semblé beaux.',
+    'tomo-lead-4':'Loin d\'être parfait. Mais c\'est précisément pourquoi je crois que c\'est authentique.',
+    'tomo-body-4':'La flamme allumée dans l\'obscurité peut être petite.<br>Même ainsi, si elle atteint les yeux de quelqu\'un——',
+    'footer-copy':'© 2026 — Tous droits réservés',
+  },
+  es: {
+    'nav-posts':'Artículos','nav-works':'Obras','nav-tomoshibi':'Lumbre',
+    'hero-subtitle':'— Crónica Personal —',
+    'hero-title':'En la Oscuridad,<br /><em>Encender una Llama</em>',
+    'hero-jp':'Pensamientos y registros de la vida diaria',
+    'hero-desc':'Este es mi diario personal — registros de viajes, fragmentos de pensamiento y las cosas bellas que encuentro cada día.',
+    'hero-cta':'Leer artículos','scroll':'Desplazar',
+    'posts-label':'— Crónica —','posts-title':'Últimos registros',
+    'tag-1':'Ensayo','title-1':'Solo en el silencio puede escucharse la verdadera voz',
+    'excerpt-1':'En la quietud de la madrugada, alejado del ruido, me di cuenta de que siempre buscamos llenar el silencio. ¿No es acaso en esos huecos donde habitan los pensamientos más puros?',
+    'tag-2':'Cotidiano','title-2':'Cómo pasar un día de lluvia y los libros que amo',
+    'excerpt-2':'Un día recuperando lecturas pendientes, con la lluvia de fondo. Notas de una tarde donde el café y los libros viejos se mezclaban.',
+    'tag-3':'Reflexión','title-3':'La estética de lo imperfecto — sobre el Wabi-Sabi',
+    'excerpt-3':'La plenitud hallada en lo que está roto. La filosofía descubierta hace siglos en Japón sigue resonando profundamente en el mundo moderno.',
+    'tag-4':'Viaje','title-4':'Lo que sentí en un santuario de Kioto de noche',
+    'excerpt-4':'El recinto del templo tras la marcha de los turistas. Solo las llamas de los faroles se mecían — sentí como si estuviera al margen del tiempo.',
+    'excerpt-5':'29 de octubre. Hacía un frío serio afuera. Paseando por la ciudad, sin darme cuenta, todos habían cambiado a ropa de abrigo. Cada año cuando llega esta temporada, pienso lo mismo — alegre y triste.',
+    'read-more':'Leer más →',
+    'tomo-lead-1':'Soy Tomoshibi, quien inscribe este diario',
+    'tomo-body-1':'Si estás buscando algo más allá de la oscuridad——',
+    'tomo-lead-2':'Siempre tuve miedo de la oscuridad',
+    'tomo-body-2':'Temía la noche. Cuando se apagaba la luz, el mundo parecía mostrar otra cara.<br>Pero ahora lo sé. Hay cosas que solo se pueden ver dentro de la oscuridad.',
+    'tomo-lead-3':'Las estrellas solo brillan en el cielo nocturno',
+    'tomo-body-3':'Este diario es mi huella. Fragmentos de viajes, libros, pensamientos dispersos en medio de la noche.<br>Un intento de capturar con palabras los momentos que encontré bellos.',
+    'tomo-lead-4':'Lejos de ser perfecto. Pero es precisamente por eso que creo que es auténtico.',
+    'tomo-body-4':'La llama encendida en la oscuridad puede ser pequeña.<br>Aun así, si llega a los ojos de alguien——',
+    'footer-copy':'© 2026 — Todos los derechos reservados',
+  },
+  pt: {
+    'nav-posts':'Artigos','nav-works':'Obras','nav-tomoshibi':'Lume',
+    'hero-subtitle':'— Crônica Pessoal —',
+    'hero-title':'Na Escuridão,<br /><em>Acender uma Chama</em>',
+    'hero-jp':'Pensamentos e registros do cotidiano',
+    'hero-desc':'Este é o meu diário pessoal — registros de viagens, fragmentos de pensamento e as coisas belas que encontro a cada dia.',
+    'hero-cta':'Ler artigos','scroll':'Rolar',
+    'posts-label':'— Crônica —','posts-title':'Últimos registros',
+    'tag-1':'Ensaio','title-1':'Somente no silêncio a verdadeira voz pode ser ouvida',
+    'excerpt-1':'Na madrugada, longe do barulho, olhando para a escuridão pela janela — percebi que sempre buscamos preencher o silêncio. Não é justamente nesses intervalos que os pensamentos mais puros habitam?',
+    'tag-2':'Cotidiano','title-2':'Como passar um dia de chuva e os livros que amo',
+    'excerpt-2':'Um dia devorando livros acumulados, com a chuva como trilha sonora. Notas de uma tarde onde café e livros antigos se misturavam.',
+    'tag-3':'Reflexão','title-3':'A estética do imperfeito — sobre o Wabi-Sabi',
+    'excerpt-3':'A completude encontrada no que está quebrado. A filosofia descoberta há séculos no Japão ressoa profundamente no mundo moderno.',
+    'tag-4':'Viagem','title-4':'O que senti em um santuário de Kyoto à noite',
+    'excerpt-4':'O recinto do templo após a saída dos turistas. Apenas as chamas das lanternas balançavam — senti como se estivesse fora do tempo.',
+    'excerpt-5':'29 de outubro. Estava seriamente frio lá fora. Andando pela cidade, todos tinham trocado sem eu perceber para roupas pesadas. Todo ano quando essa estação chega, penso a mesma coisa — feliz e triste.',
+    'read-more':'Ler mais →',
+    'tomo-lead-1':'Sou Tomoshibi, quem inscreve este diário',
+    'tomo-body-1':'Se você está buscando algo além da escuridão——',
+    'tomo-lead-2':'Sempre tive medo do escuro',
+    'tomo-body-2':'Temia a noite. Quando a luz se apagava, o mundo parecia mostrar outra face.<br>Mas agora sei. Há coisas que só podem ser vistas dentro da escuridão.',
+    'tomo-lead-3':'As estrelas só brilham no céu noturno',
+    'tomo-body-3':'Este diário é meu rastro. Fragmentos de viagens, livros, pensamentos soltos no meio da noite.<br>Uma tentativa de capturar em palavras os momentos que achei belos.',
+    'tomo-lead-4':'Longe de ser perfeito. Mas é exatamente por isso que acredito que é genuíno.',
+    'tomo-body-4':'A chama acesa na escuridão pode ser pequena.<br>Mesmo assim, se chegar aos olhos de alguém——',
+    'footer-copy':'© 2026 — Todos os direitos reservados',
+  },
+  hi: {
+    'nav-posts':'लेख','nav-works':'रचनाएँ','nav-tomoshibi':'दीपशिखा',
+    'hero-subtitle':'— व्यक्तिगत वृत्तांत —',
+    'hero-title':'अंधेरे में,<br /><em>ज्योति जलाना</em>',
+    'hero-jp':'दैनिक विचार और अभिलेख',
+    'hero-desc':'यह मेरी व्यक्तिगत डायरी है — यात्राओं के संस्मरण, विचारों के टुकड़े, और रोज़मर्रा में मिलने वाली सुंदर चीज़ें।',
+    'hero-cta':'लेख पढ़ें','scroll':'स्क्रॉल',
+    'posts-label':'— वृत्तांत —','posts-title':'नवीनतम अभिलेख',
+    'tag-1':'निबंध','title-1':'केवल मौन में ही सच्ची आवाज़ सुनाई देती है',
+    'excerpt-1':'देर रात शोर से दूर, खिड़की के बाहर फैले अंधेरे को निहारते हुए मुझे एहसास हुआ — हम हमेशा किसी न किसी आवाज़ से खुद को भरते रहते हैं। क्या उन्हीं मौन के क्षणों में शुद्धतम विचार नहीं बसते?',
+    'tag-2':'दिनचर्या','title-2':'बारिश के दिन कैसे बिताएं और पसंदीदा किताबें',
+    'excerpt-2':'बारिश की आवाज़ के साथ जमा किताबें पढ़ने का दिन। एक दोपहर जब कॉफ़ी और पुरानी किताबों की खुशबू आपस में मिल गई।',
+    'tag-3':'चिंतन','title-3':'अपूर्णता का सौंदर्यशास्त्र — वाबी-साबी पर',
+    'excerpt-3':'टूटे हुए में जो पूर्णता मिलती है। सदियों पहले जापान ने जिस दर्शन की खोज की, वह आज भी आधुनिक दुनिया में गहराई से गूँजता है।',
+    'tag-4':'यात्रा','title-4':'क्योटो के मंदिर में रात को जो महसूस किया',
+    'excerpt-4':'पर्यटकों के जाने के बाद का मंदिर परिसर। केवल दीपों की लौ हिल रही थी — ऐसा लगा जैसे समय के बाहर खड़ा हूँ।',
+    'excerpt-5':'29 अक्तूबर। बाहर वाकई ठंड थी। शहर में चलते हुए, बिना ध्यान दिए सभी ने भारी कपड़े पहन लिए थे। हर साल जब यह मौसम आता है, मैं एक ही बात सोचता हूँ — खुश भी, उदास भी।',
+    'read-more':'और पढ़ें →',
+    'tomo-lead-1':'मैं तोमोशिबि हूँ, इस डायरी का लेखक',
+    'tomo-body-1':'यदि आप अंधेरे के उस पार कुछ खोज रहे हैं——',
+    'tomo-lead-2':'मैं हमेशा अंधेरे से डरता था',
+    'tomo-body-2':'रात से डर लगता था। जब रोशनी बुझ जाती, दुनिया जैसे दूसरा रूप दिखाती।<br>पर अब जानता हूँ। कुछ चीज़ें केवल अंधेरे में ही दिखती हैं।',
+    'tomo-lead-3':'तारे केवल रात के आकाश में चमकते हैं',
+    'tomo-body-3':'यह डायरी मेरा निशान है। सफ़र के, किताबों के, रात के अनायास विचारों के टुकड़े।<br>उन पलों को शब्दों में पकड़ने का प्रयास जो सुंदर लगे।',
+    'tomo-lead-4':'पूर्णता से कोसों दूर। पर इसीलिए असली मानता हूँ।',
+    'tomo-body-4':'अंधेरे में जलाई गई लौ छोटी हो सकती है।<br>फिर भी, यदि वह किसी की आँखों तक पहुँचे——',
+    'footer-copy':'© 2026 — सर्वाधिकार सुरक्षित',
+  },
+  ar: {
+    'nav-posts':'المقالات','nav-works':'أعمال','nav-tomoshibi':'ضوء',
+    'hero-subtitle':'— مذكرات شخصية —',
+    'hero-title':'في الظلام،<br /><em>إضاءة شعلة</em>',
+    'hero-jp':'أفكار وسجلات من الحياة اليومية',
+    'hero-desc':'هذه مذكراتي الشخصية — سجلات السفر، وشذرات الفكر، والأشياء الجميلة التي أجدها كل يوم.',
+    'hero-cta':'اقرأ المقالات','scroll':'مرر',
+    'posts-label':'— السجل —','posts-title':'أحدث الكتابات',
+    'tag-1':'مقال','title-1':'في الصمت وحده تُسمع الصوت الحقيقي',
+    'excerpt-1':'في عمق الليل، بعيدًا عن الضوضاء، أدركت أننا نسعى دومًا لملء الصمت بالأصوات. أليس في تلك الفجوات الصامتة تسكن أنقى الأفكار؟',
+    'tag-2':'يوميات','title-2':'كيف أقضي يوم المطر والكتب التي أحبها',
+    'excerpt-2':'يوم قضيته في قراءة الكتب المتراكمة على وقع المطر. ملاحظات من بعد ظهر جمعت فيه رائحة القهوة والكتب القديمة.',
+    'tag-3':'تأمل','title-3':'جماليات النقص — في الوابي-سابي',
+    'excerpt-3':'الاكتمال الموجود في ما هو مكسور. الفلسفة التي اكتشفتها اليابان منذ قرون لا تزال تتردد صداها في عالمنا الحديث.',
+    'tag-4':'سفر','title-4':'ما شعرت به في ضريح كيوتو ليلًا',
+    'excerpt-4':'ساحة المعبد بعد رحيل السياح. لم تكن تتحرك سوى ألسنة اللهب في الفوانيس — شعرت كأنني واقف خارج الزمن.',
+    'excerpt-5':'29 أكتوبر. كان الجو بارداً جداً في الخارج. بينما كنت أتجول في المدينة، لاحظت أن الجميع قد انتقل بهدوء إلى ملابس ثقيلة. كل عام حين يأتي هذا الموسم، أفكر في الشيء ذاته — فرحٌ وحزن.',
+    'read-more':'← اقرأ المزيد',
+    'tomo-lead-1':'أنا توموشيبي، من ينقش هذه اليوميات',
+    'tomo-body-1':'إذا كنت تبحث عن شيء ما وراء الظلام——',
+    'tomo-lead-2':'كنت دائماً أخاف الظلام',
+    'tomo-body-2':'كنت أخشى الليل. حين تنطفئ الأنوار، يبدو العالم كأنه يكشف وجهاً آخر.<br>لكنني الآن أعرف. ثمة أشياء لا تُرى إلا في الظلام.',
+    'tomo-lead-3':'النجوم لا تتلألأ إلا في سماء الليل',
+    'tomo-body-3':'هذه اليوميات أثري في الوجود. شذرات من أسفار وكتب وأفكار عشوائية في منتصف الليل.<br>محاولة لالتقاط اللحظات الجميلة بالكلمات.',
+    'tomo-lead-4':'بعيد عن الكمال. لكن هذا بالضبط ما يجعله حقيقياً.',
+    'tomo-body-4':'الشعلة التي تُضاء في الظلام يمكن أن تكون صغيرة.<br>ومع ذلك، إذا وصلت إلى عيون أحدهم——',
+    'footer-copy':'© 2026 — جميع الحقوق محفوظة',
+  },
+  bn: {
+    'nav-posts':'প্রবন্ধ','nav-works':'সৃষ্টিকর্ম','nav-tomoshibi':'আলো',
+    'hero-subtitle':'— ব্যক্তিগত বৃত্তান্ত —',
+    'hero-title':'অন্ধকারে,<br /><em>আলো জ্বালানো</em>',
+    'hero-jp':'দৈনন্দিন ভাবনা ও অভিলেখ',
+    'hero-desc':'এটি আমার ব্যক্তিগত ডায়েরি — ভ্রমণের স্মৃতি, চিন্তার টুকরো, এবং প্রতিদিনের জীবনে মেলা সুন্দর জিনিসগুলো।',
+    'hero-cta':'প্রবন্ধ পড়ুন','scroll':'স্ক্রোল',
+    'posts-label':'— বৃত্তান্ত —','posts-title':'সর্বশেষ লেখা',
+    'tag-1':'প্রবন্ধ','title-1':'কেবল নীরবতায় প্রকৃত কণ্ঠস্বর শোনা যায়',
+    'excerpt-1':'গভীর রাতে কোলাহল থেকে দূরে, জানালার বাইরের অন্ধকারের দিকে তাকিয়ে উপলব্ধি হলো — আমরা সর্বদা শব্দ দিয়ে নিজেদের ভরিয়ে রাখি। সেই নীরবতার ফাঁকেই কি নয় সবচেয়ে বিশুদ্ধ চিন্তার বাস?',
+    'tag-2':'দৈনন্দিন','title-2':'বৃষ্টির দিন কীভাবে কাটাই এবং পছন্দের বইগুলো',
+    'excerpt-2':'বৃষ্টির শব্দকে পটভূমি করে জমানো বই পড়ার একটি দিন। কফি আর পুরনো বইয়ের গন্ধ মিলেমিশে যাওয়া এক বিকেলের কথা।',
+    'tag-3':'চিন্তন','title-3':'অসম্পূর্ণতার নান্দনিকতা — ওয়াবি-সাবি প্রসঙ্গে',
+    'excerpt-3':'ভাঙা জিনিসের মধ্যে যে পরিপূর্ণতা লুকিয়ে থাকে। বহু শতাব্দী আগে জাপান যে দর্শন আবিষ্কার করেছিল, তা আজও আধুনিক বিশ্বে গভীরভাবে অনুরণিত হয়।',
+    'tag-4':'ভ্রমণ','title-4':'কিয়োটোর মন্দিরে রাতে যা অনুভব করলাম',
+    'excerpt-4':'পর্যটকরা চলে যাওয়ার পরের মন্দির প্রাঙ্গণ। শুধু লণ্ঠনের শিখা দুলছিল — মনে হলো যেন সময়ের বাইরে দাঁড়িয়ে আছি।',
+    'excerpt-5':'২৯ অক্টোবর। বাইরে সত্যিই ঠান্ডা ছিল। শহরে হাঁটতে হাঁটতে দেখলাম, কখন জানি সবাই মোটা পোশাক পরে নিয়েছে। প্রতি বছর এই মৌসুম আসলে মনে হয় — আনন্দ আর বিষণ্ণতা।',
+    'read-more':'আরও পড়ুন →',
+    'tomo-lead-1':'আমি তোমোশিবি, এই ডায়েরির লেখক',
+    'tomo-body-1':'যদি আপনি অন্ধকারের ওপারে কিছু খুঁজছেন——',
+    'tomo-lead-2':'আমি সবসময় অন্ধকারকে ভয় পেতাম',
+    'tomo-body-2':'রাতকে ভয় লাগত। আলো নিভলে মনে হত পৃথিবী অন্য রূপ ধারণ করেছে।<br>কিন্তু এখন জানি। কিছু জিনিস শুধু অন্ধকারের ভেতরেই দেখা যায়।',
+    'tomo-lead-3':'তারারা শুধু রাতের আকাশেই জ্বলে',
+    'tomo-body-3':'এই ডায়েরি আমার চিহ্ন। ভ্রমণ, বই, মাঝরাতের ভাবনার টুকরো।<br>সুন্দর মনে হওয়া মুহূর্তগুলো শব্দে ধরার চেষ্টা।',
+    'tomo-lead-4':'নিখুঁত থেকে অনেক দূরে। কিন্তু তাই বলেই সত্যি মনে করি।',
+    'tomo-body-4':'অন্ধকারে জ্বালানো আলো ছোট হতে পারে।<br>তবুও, যদি কারো চোখে পৌঁছায়——',
+    'footer-copy':'© 2026 — সর্বস্বত্ব সংরক্ষিত',
+  },
+  ru: {
+    'nav-posts':'Статьи','nav-works':'Работы','nav-tomoshibi':'Огонёк',
+    'hero-subtitle':'— Личная хроника —',
+    'hero-title':'Во тьме<br /><em>зажечь огонь</em>',
+    'hero-jp':'Мысли и записи повседневной жизни',
+    'hero-desc':'Это мой личный дневник — записи о путешествиях, фрагменты мыслей и красивые вещи, встреченные в ежедневной жизни.',
+    'hero-cta':'Читать статьи','scroll':'Прокрутить',
+    'posts-label':'— Хроника —','posts-title':'Последние записи',
+    'tag-1':'Эссе','title-1':'Только в тишине можно услышать настоящий голос',
+    'excerpt-1':'Поздно ночью, вдали от шума, глядя во тьму за окном, я осознал: мы постоянно заполняем себя звуками. Но не в этих тихих промежутках ли живут самые чистые мысли?',
+    'tag-2':'Будни','title-2':'Как провести дождливый день и любимые книги',
+    'excerpt-2':'День, посвящённый давно отложенным книгам, под звук дождя. Заметки об одном послеполудни, где кофе и старые книги слились воедино.',
+    'tag-3':'Размышление','title-3':'Эстетика несовершенства — о Wabi-Sabi',
+    'excerpt-3':'Целостность, обнаруженная в сломленном. Философия, открытая Японией века назад, по сей день глубоко резонирует в современном мире.',
+    'tag-4':'Путешествие','title-4':'Что я почувствовал в святилище Киото ночью',
+    'excerpt-4':'Территория храма после ухода туристов. Только пламя фонарей колыхалось в тишине — я ощутил себя стоящим вне времени.',
+    'excerpt-5':'29 октября. На улице было по-настоящему холодно. Прогуливаясь по городу, я заметил, что все незаметно перешли на тёплую одежду. Каждый год, когда наступает этот сезон, думаю одно и то же — радостно и грустно.',
+    'read-more':'Читать далее →',
+    'tomo-lead-1':'Я — Томосиби, тот, кто вписывает эти записи',
+    'tomo-body-1':'Если вы ищете что-то там, за темнотой——',
+    'tomo-lead-2':'Я всегда боялся темноты',
+    'tomo-body-2':'Я боялся ночи. Когда свет гас, мир словно показывал другое лицо.<br>Но теперь я знаю. Есть вещи, которые видны только во тьме.',
+    'tomo-lead-3':'Звёзды светят лишь в ночном небе',
+    'tomo-body-3':'Этот дневник — мой след. Обрывки из путешествий, книг, случайных мыслей посреди ночи.<br>Попытка поймать словами мгновения, которые я нашёл прекрасными.',
+    'tomo-lead-4':'Далеко от совершенства. Но именно поэтому я считаю это настоящим.',
+    'tomo-body-4':'Огонь, зажжённый во тьме, может быть маленьким.<br>И всё же, если он достигнет чьих-то глаз——',
+    'footer-copy':'© 2026 — Все права защищены',
+  },
+  id: {
+    'nav-posts':'Artikel','nav-works':'Karya','nav-tomoshibi':'Cahaya',
+    'hero-subtitle':'— Catatan Pribadi —',
+    'hero-title':'Di Balik Kegelapan,<br /><em>Menyalakan Api</em>',
+    'hero-jp':'Pikiran dan catatan kehidupan sehari-hari',
+    'hero-desc':'Ini adalah jurnal pribadi saya — catatan perjalanan, serpihan pikiran, dan hal-hal indah yang saya temui setiap hari.',
+    'hero-cta':'Baca Artikel','scroll':'Gulir',
+    'posts-label':'— Kronik —','posts-title':'Catatan Terbaru',
+    'tag-1':'Esai','title-1':'Hanya dalam Keheningan Suara Sejati Dapat Terdengar',
+    'excerpt-1':'Larut malam, jauh dari kebisingan, memandangi kegelapan di luar jendela — saya menyadari kita selalu berusaha mengisi diri dengan suara. Bukankah di celah-celah sunyi itulah pikiran paling murni bersemayam?',
+    'tag-2':'Keseharian','title-2':'Cara Menghabiskan Hari Hujan dan Buku Favorit Saya',
+    'excerpt-2':'Sehari membereskan tumpukan bacaan diiringi suara hujan. Catatan dari sore ketika kopi dan buku lama saling berpadu.',
+    'tag-3':'Refleksi','title-3':'Estetika Ketidaksempurnaan — Tentang Wabi-Sabi',
+    'excerpt-3':'Keutuhan yang ditemukan dalam yang retak. Filosofi yang ditemukan Jepang berabad-abad lalu masih bergema dalam di dunia modern.',
+    'tag-4':'Perjalanan','title-4':'Apa yang Saya Rasakan di Kuil Kyoto Malam Hari',
+    'excerpt-4':'Halaman kuil setelah para wisatawan pergi. Hanya nyala lentera yang bergoyang — seolah saya berdiri di luar batas waktu.',
+    'excerpt-5':'29 Oktober. Di luar benar-benar dingin. Berjalan di kota, tanpa sadar semua orang sudah beralih ke pakaian tebal. Setiap tahun ketika musim ini tiba, saya selalu berpikir hal yang sama — senang dan sedih.',
+    'read-more':'Baca selengkapnya →',
+    'tomo-lead-1':'Saya Tomoshibi, yang mengukir jurnal ini',
+    'tomo-body-1':'Jika kamu mencari sesuatu di balik kegelapan——',
+    'tomo-lead-2':'Saya selalu takut pada kegelapan',
+    'tomo-body-2':'Saya takut malam. Saat cahaya padam, dunia seolah menampilkan wajah berbeda.<br>Tapi kini saya tahu. Ada hal-hal yang hanya bisa dilihat dalam kegelapan.',
+    'tomo-lead-3':'Bintang hanya bersinar di langit malam',
+    'tomo-body-3':'Jurnal ini adalah jejakku. Serpihan perjalanan, buku, pikiran acak di tengah malam.<br>Upaya untuk menangkap dalam kata-kata momen-momen yang kutemukan indah.',
+    'tomo-lead-4':'Jauh dari sempurna. Tapi justru itulah mengapa saya percaya ini nyata.',
+    'tomo-body-4':'Api yang dinyalakan dalam kegelapan bisa saja kecil.<br>Meski begitu, jika ia sampai di mata seseorang——',
+    'footer-copy':'© 2026 — Semua hak dilindungi',
+  },
+  de: {
+    'nav-posts':'Artikel','nav-works':'Werke','nav-tomoshibi':'Licht',
+    'hero-subtitle':'— Persönliche Chronik —',
+    'hero-title':'Im Dunkel<br /><em>ein Licht entfachen</em>',
+    'hero-jp':'Gedanken und Aufzeichnungen des Alltags',
+    'hero-desc':'Dies ist mein persönliches Tagebuch — Reiseberichte, Gedankensplitter und die schönen Dinge, die mir täglich begegnen.',
+    'hero-cta':'Artikel lesen','scroll':'Scrollen',
+    'posts-label':'— Chronik —','posts-title':'Neueste Einträge',
+    'tag-1':'Essay','title-1':'Nur in der Stille ist die wahre Stimme zu hören',
+    'excerpt-1':'Tief in der Nacht, fern vom Lärm, in die Dunkelheit vor dem Fenster starrend — ich erkannte, dass wir uns immer mit Geräuschen füllen. Sind es nicht gerade diese stillen Zwischenräume, in denen die reinsten Gedanken wohnen?',
+    'tag-2':'Alltag','title-2':'Wie ich einen Regentag verbringe und Lieblingsbücher',
+    'excerpt-2':'Ein Tag, an dem ich den Bücherstapel abarbeite, untermalt vom Regen. Notizen über einen Nachmittag, an dem sich Kaffee- und Bücherdüfte vermischten.',
+    'tag-3':'Reflexion','title-3':'Die Ästhetik des Unvollkommenen — über Wabi-Sabi',
+    'excerpt-3':'Die Vollständigkeit im Gebrochenen. Die Philosophie, die Japan vor Jahrhunderten entdeckte, resoniert noch heute tief in der modernen Welt.',
+    'tag-4':'Reise','title-4':'Was ich bei einem nächtlichen Schreinbesuch in Kyoto spürte',
+    'excerpt-4':'Der Tempelbereich nach dem Abgang der Touristen. Nur die Laternenlichter schwankten — ich fühlte mich außerhalb der Zeit stehend.',
+    'excerpt-5':'29. Oktober. Draußen war es wirklich kalt. Bei einem Spaziergang durch die Stadt bemerkte ich, dass alle unbemerkt auf schwere Kleidung gewechselt hatten. Jedes Jahr wenn diese Jahreszeit kommt, denke ich dasselbe — froh und traurig.',
+    'read-more':'Weiterlesen →',
+    'tomo-lead-1':'Ich bin Tomoshibi, derjenige, der dieses Tagebuch beschreibt',
+    'tomo-body-1':'Wenn du jenseits der Dunkelheit nach etwas suchst——',
+    'tomo-lead-2':'Ich hatte immer Angst vor der Dunkelheit',
+    'tomo-body-2':'Ich fürchtete die Nacht. Wenn das Licht erlosch, schien die Welt ein anderes Gesicht zu zeigen.<br>Doch heute weiß ich: Es gibt Dinge, die man nur in der Dunkelheit sehen kann.',
+    'tomo-lead-3':'Sterne leuchten nur am Nachthimmel',
+    'tomo-body-3':'Dieses Tagebuch ist meine Spur. Bruchstücke von Reisen, Büchern, nächtlichen Gedanken.<br>Der Versuch, Augenblicke der Schönheit in Worte zu fassen.',
+    'tomo-lead-4':'Weit von Perfektion entfernt. Aber genau deshalb glaube ich, dass es echt ist.',
+    'tomo-body-4':'Die Flamme, die in der Dunkelheit entzündet wird, darf klein sein.<br>Wenn sie dennoch jemandes Augen erreicht——',
+    'footer-copy':'© 2026 — Alle Rechte vorbehalten',
+  },
+  pl: {
+    'nav-posts':'Artykuły','nav-works':'Twórczość','nav-tomoshibi':'Blask',
+    'hero-subtitle':'— Osobista Kronika —',
+    'hero-title':'W Ciemności<br /><em>Zapalić Światło</em>',
+    'hero-jp':'Myśli i zapiski z codziennego życia',
+    'hero-desc':'To mój osobisty dziennik — wspomnienia z podróży, fragmenty myśli i piękne rzeczy, które spotykam każdego dnia.',
+    'hero-cta':'Czytaj artykuły','scroll':'Przewiń',
+    'posts-label':'— Kronika —','posts-title':'Najnowsze wpisy',
+    'tag-1':'Esej','title-1':'Tylko w ciszy można usłyszeć prawdziwy głos',
+    'excerpt-1':'Późno w nocy, z dala od zgiełku, wpatrując się w ciemność za oknem — uświadomiłem sobie, że zawsze staramy się wypełniać siebie dźwiękami. Czy właśnie w tych cichych przerwach nie mieszkają najczystsze myśli?',
+    'tag-2':'Codzienność','title-2':'Jak spędzić deszczowy dzień i ulubione książki',
+    'excerpt-2':'Dzień na nadrabianiu zaległości czytelniczych przy deszczu w tle. Zapiski z pewnego popołudnia, gdy kawa i stare książki stworzyły wyjątkową mieszankę.',
+    'tag-3':'Refleksja','title-3':'Estetyka niedoskonałości — o Wabi-Sabi',
+    'excerpt-3':'Pełnia odnaleziona w tym, co złamane. Filozofia odkryta przez Japonię wieki temu nadal głęboko rezonuje we współczesnym świecie.',
+    'tag-4':'Podróż','title-4':'Co poczułem w świątyni w Kioto nocą',
+    'excerpt-4':'Teren świątyni po odejściu turystów. Tylko płomienie latarni kołysały się w ciemności — poczułem, jakbym stał poza czasem.',
+    'excerpt-5':'29 października. Na zewnątrz było naprawdę zimno. Spacerując po mieście, zauważyłem, że wszyscy niepostrzeżenie przeszli na ciepłe ubrania. Co roku kiedy nadchodzi ta pora roku, myślę to samo — radość i smutek.',
+    'read-more':'Czytaj więcej →',
+    'tomo-lead-1':'Jestem Tomoshibi, ten, który zapisuje ten dziennik',
+    'tomo-body-1':'Jeśli szukasz czegoś po drugiej stronie ciemności——',
+    'tomo-lead-2':'Zawsze bałem się ciemności',
+    'tomo-body-2':'Bałem się nocy. Gdy gasło światło, świat zdawał się pokazywać inną twarz.<br>Ale teraz wiem. Są rzeczy, które można zobaczyć tylko w ciemności.',
+    'tomo-lead-3':'Gwiazdy błyszczą tylko na nocnym niebie',
+    'tomo-body-3':'Ten dziennik jest moim śladem. Fragmenty podróży, książek, przypadkowych myśli w środku nocy.<br>Próba uchwycenia w słowach chwil, które uznałem za piękne.',
+    'tomo-lead-4':'Daleki od doskonałości. Ale właśnie dlatego uważam, że jest prawdziwy.',
+    'tomo-body-4':'Płomień zapalony w ciemności może być mały.<br>Nawet tak, jeśli dotrze do czyichś oczu——',
+    'footer-copy':'© 2026 — Wszelkie prawa zastrzeżone',
+  },
+  ko: {
+    'nav-posts':'글','nav-works':'작품','nav-tomoshibi':'등불',
+    'hero-subtitle':'— 개인 기록 —',
+    'hero-title':'어둠 속에서,<br /><em>빛을 밝히다</em>',
+    'hero-jp':'일상의 사유와 기록',
+    'hero-desc':'이것은 나의 개인 일기 — 여행의 기록, 단상의 파편, 그리고 일상에서 만난 아름다운 순간들.',
+    'hero-cta':'글 읽기','scroll':'스크롤',
+    'posts-label':'— 연대기 —','posts-title':'최근 기록',
+    'tag-1':'일기','title-1':'공기의 냄새가, 여름으로 바뀌었다',
+    'excerpt-1':'잎의 냄새? 초록의 냄새? 흙의 냄새? 매년 딱 맞는 표현이 떠오르지 않아 답답하지만, 매년 반드시 알아차린다 — 이 순간을. 더위여, 살살 와줘.',
+    'tag-2':'일기','title-2':'밤공기가, 겨울 냄새로 바뀌었다',
+    'excerpt-2':'밤에 바깥 공기 냄새가 겨울로 바뀌었다. 여름의 풋내가 갑자기 사라진 것 같은, 공기 자체가 갑자기 건조해진 것 같은 — 여전히 말로 표현하기 어렵다.',
+    'tag-3':'일기','title-3':'3월에, 눈이 쌓였다',
+    'excerpt-3':'얼마 전에 "이제 봄이 오려나"라고 썼을 뿐인데, 오늘은 눈이 5cm 이상 쌓였다. 두껍게 입고 나가면 덥고 땀이 나고, 벗어서 손에 들어야 하는 그 번거로움.',
+    'tag-4':'일기','title-4':'해가 짧아진 걸 느꼈다, 여름 오후에',
+    'excerpt-4':'8월 16일. 엊그제부터 해가 짧아진 것 같다는 느낌이 들었다. 몸의 감각은 달력보다 계절에 정직하다.',
+    'tag-5':'일기','title-5':'거리가, 겨울 채비를 하고 있었다',
+    'excerpt-5':'10월 29일. 바깥은 진짜 추웠다. 거리를 걷다 보니 어느새 다들 두꺼운 옷으로 바꿔 입어 있었다. 매년 이 계절이 올 때마다 생각한다 — 기쁘고, 쓸쓸하다.',
+    'read-more':'더 읽기 →',
+    'tomoshibi-label':'— 등불 —','tomoshibi-body':'',
+    'tomo-lead-1':'이 일기의 기록자, 등불（ともしび）이라고 합니다',
+    'tomo-body-1':'이 어둠 너머에서 무언가를 찾고 있다면——',
+    'tomo-lead-2':'어둠을, 줄곧 두려워했다',
+    'tomo-body-2':'밤이 무서웠다. 빛이 꺼지면 세상이 다른 얼굴을 보여주는 것 같아서.<br>하지만 이제는 안다. 어둠 속에서만 보이는 것이 있다.',
+    'tomo-lead-3':'별은, 밤하늘에서만 빛난다',
+    'tomo-body-3':'이 일기는 나의 흔적이다. 여행, 책, 문득 떠오른 한밤의 단상들의 파편.<br>아름답다고 느낀 순간을 말로 붙잡으려는 시도.',
+    'tomo-lead-4':'완벽과는 거리가 멀다. 하지만, 그렇기에 진짜라고 생각한다.',
+    'tomo-body-4':'어둠 속에서 밝히는 불은, 작아도 된다.<br>그래도, 누군가의 눈에 닿는다면——',
+    'footer-copy':'© 灯火 2026 — 모든 권리 보유',
+  },
+  zh: {
+    'nav-posts':'文章','nav-works':'作品','nav-tomoshibi':'灯火',
+    'hero-subtitle':'— 个人记事 —',
+    'hero-title':'在黑暗中，<br /><em>点燃一道光</em>',
+    'hero-jp':'日常思绪与记录',
+    'hero-desc':'这是我的私人日记——旅途记录、思想碎片，以及日常中遇见的美好瞬间。',
+    'hero-cta':'阅读文章','scroll':'滚动',
+    'posts-label':'— 编年史 —','posts-title':'最新记录',
+    'tag-1':'日记','title-1':'空气的气味，变成了夏天',
+    'excerpt-1':'树叶的气味？绿色的气味？泥土的气味？每年都找不到合适的表达，但每年都一定会注意到——这个瞬间。',
+    'tag-2':'日记','title-2':'夜晚的空气，变成了冬天的味道',
+    'excerpt-2':'夜晚，室外空气的味道变成了冬天。就像夏天的青涩气息突然消失，空气本身突然变得干燥——依然难以用语言表达。',
+    'tag-3':'日记','title-3':'三月，下雪了',
+    'excerpt-3':'不久前刚写了"春天快来了"，今天却下了超过5厘米的雪。穿厚了出门会热会出汗，脱下来还要拿在手里——真是麻烦。',
+    'tag-4':'日记','title-4':'在夏日午后，感到白昼变短了',
+    'excerpt-4':'8月16日。前天开始感觉白昼可能变短了。身体感知比日历更诚实地了解季节。',
+    'tag-5':'日记','title-5':'街道，在为冬天做准备',
+    'excerpt-5':'10月29日。外面真的很冷。走在街上，不知什么时候大家都换上了厚重的衣服。每年这个季节来临时都会想——高兴，寂寞。',
+    'read-more':'阅读更多 →',
+    'tomoshibi-label':'— 灯火 —','tomoshibi-body':'',
+    'tomo-lead-1':'这本日记的记录者，灯火（ともしび）',
+    'tomo-body-1':'如果你在这黑暗之外寻找什么——',
+    'tomo-lead-2':'我一直害怕黑暗',
+    'tomo-body-2':'害怕夜晚。灯光熄灭时，世界似乎会露出另一张脸。<br>但现在我知道了。有些东西只有在黑暗中才能看见。',
+    'tomo-lead-3':'星星，只在夜空中闪耀',
+    'tomo-body-3':'这本日记是我的痕迹。旅途、书籍、深夜偶然浮现的思绪碎片。<br>试图用文字捕捉那些觉得美丽的瞬间。',
+    'tomo-lead-4':'远非完美。但正因如此，我认为它是真实的。',
+    'tomo-body-4':'在黑暗中点燃的火，可以很小。<br>即便如此，如果能触达某人的眼睛——',
+    'footer-copy':'© 灯火 2026 — 版权所有',
+  },
+  yue: {
+    'nav-posts':'文章','nav-works':'作品','nav-tomoshibi':'燈火',
+    'hero-subtitle':'— 個人記事 —',
+    'hero-title':'在黑暗裏，<br /><em>點亮一道光</em>',
+    'hero-jp':'日常思緒與記錄',
+    'hero-desc':'呢本係我嘅私人日記——旅途記錄、思想碎片，同埋日常中遇見嘅美好瞬間。',
+    'hero-cta':'睇文章','scroll':'滾動',
+    'posts-label':'— 編年史 —','posts-title':'最新記錄',
+    'tag-1':'日記','title-1':'空氣嘅氣味，變成咗夏天',
+    'excerpt-1':'樹葉嘅氣味？綠色嘅氣味？泥土嘅氣味？每年都搵唔到合適嘅表達，但每年都一定會留意到——呢個瞬間。',
+    'tag-2':'日記','title-2':'夜晚嘅空氣，變成咗冬天嘅味道',
+    'excerpt-2':'夜晚，室外空氣嘅味道變成咗冬天。就好似夏天嘅青澀氣息突然消失，空氣本身突然變乾——依然難以用言語表達。',
+    'tag-3':'日記','title-3':'三月，落雪喇',
+    'excerpt-3':'唔係好耐之前剛寫咗「春天快嚟喇」，今日卻落咗超過5厘米嘅雪。著厚衫出門會熱會出汗，除咗仲要拎喺手——真係麻煩。',
+    'tag-4':'日記','title-4':'喺夏日下午，感受到白晝變短咗',
+    'excerpt-4':'8月16日。前日開始感覺白晝可能變短咗。身體感知比日曆更誠實地了解季節。',
+    'tag-5':'日記','title-5':'街道，喺為冬天做準備',
+    'excerpt-5':'10月29日。外面真係好凍。行喺街上，唔知幾時大家都換上咗厚重嘅衣服。每年呢個季節嚟臨時都會諗——開心，寂寞。',
+    'read-more':'閱讀更多 →',
+    'tomoshibi-label':'— 燈火 —','tomoshibi-body':'',
+    'tomo-lead-1':'呢本日記嘅記錄者，燈火（ともしび）',
+    'tomo-body-1':'如果你喺呢個黑暗之外搵緊啲嘢——',
+    'tomo-lead-2':'我一直都怕黑',
+    'tomo-body-2':'好驚夜晚。熄燈之後，世界似乎會露出另一張臉。<br>但係而家我知道喇。有啲嘢只有喺黑暗中先至見得到。',
+    'tomo-lead-3':'星星，只喺夜空中閃耀',
+    'tomo-body-3':'呢本日記係我嘅痕跡。旅途、書籍、深夜偶然浮現嘅思緒碎片。<br>試圖用文字捕捉嗰啲覺得美麗嘅瞬間。',
+    'tomo-lead-4':'遠非完美。但正因如此，我認為佢係真實嘅。',
+    'tomo-body-4':'喺黑暗中點燃嘅火，可以好細。<br>即使咁，如果能觸達某人嘅眼睛——',
+    'footer-copy':'© 燈火 2026 — 版權所有',
+  },
+};
+
+let currentLang = 'ja';
+const CODES = {ja:'JA',en:'EN',fr:'FR',es:'ES',pt:'PT',hi:'HI',ar:'AR',bn:'BN',ru:'RU',id:'ID',de:'DE',pl:'PL',ko:'KO',zh:'ZH',yue:'YUE'};
+
+function setLanguage(lang) {
+  if (!t[lang]) return;
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = t[lang][el.dataset.i18n];
+    if (v !== undefined) el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const v = t[lang][el.dataset.i18nHtml];
+    if (v !== undefined) el.innerHTML = v;
+  });
+
+  document.getElementById('lang-current').textContent = CODES[lang];
+  document.querySelectorAll('#lang-dropdown li').forEach(li => {
+    li.classList.toggle('active', li.dataset.lang === lang);
+  });
+  try { localStorage.setItem('lang', lang); } catch(e) {}
+  currentLang = lang;
+  // Apply articleMeta translations (tags, titles, excerpts 6-11)
+  try {
+    const meta = articleMeta[lang];
+    if (meta) {
+      if (meta.tag) {
+        document.querySelectorAll('.post-tag').forEach(el => { el.textContent = meta.tag; });
+      }
+      if (meta.titles) {
+        meta.titles.forEach((title, i) => {
+          const el = document.querySelector(`[data-i18n="title-${i+1}"]`);
+          if (el) el.textContent = title;
+        });
+      }
+      if (meta.excerpts) {
+        meta.excerpts.forEach((exc, i) => {
+          const el = document.querySelector(`[data-i18n="excerpt-${i+6}"]`);
+          if (el) el.textContent = exc;
+        });
+      }
+    }
+  } catch(e) {}
+  document.dispatchEvent(new CustomEvent('langchange', {detail: lang}));
+}
+
+/* ── Lang Picker ── */
+const langPicker = document.getElementById('lang-picker');
+const langBtn    = document.getElementById('lang-btn');
+
+langBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  const open = langPicker.classList.toggle('open');
+  langBtn.setAttribute('aria-expanded', open);
+});
+
+document.getElementById('lang-dropdown').addEventListener('click', e => {
+  const li = e.target.closest('li[data-lang]');
+  if (!li) return;
+  setLanguage(li.dataset.lang);
+  langPicker.classList.remove('open');
+  langBtn.setAttribute('aria-expanded', 'false');
+});
+
+document.addEventListener('click', e => {
+  if (!langPicker.contains(e.target)) {
+    langPicker.classList.remove('open');
+    langBtn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+/* Restore saved language */
+(function() {
+  let saved;
+  try { saved = localStorage.getItem('lang'); } catch(e) {}
+  setLanguage(t[saved] ? saved : 'ja');
+})();
+
+/* ── Hamburger ── */
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobile-nav');
+let menuOpen = false;
+
+function openMenu()  { menuOpen=true;  hamburger.classList.add('open');    hamburger.setAttribute('aria-expanded','true');  mobileNav.classList.add('open');    mobileNav.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+function closeMenu() { menuOpen=false; hamburger.classList.remove('open'); hamburger.setAttribute('aria-expanded','false'); mobileNav.classList.remove('open'); mobileNav.setAttribute('aria-hidden','true');  document.body.style.overflow=''; }
+hamburger.addEventListener('click', () => menuOpen ? closeMenu() : openMenu());
+
+/* ── Ember Particles ── */
+const canvas = document.getElementById('ember-canvas');
+const ctx    = canvas.getContext('2d');
+let W, H, embers = [];
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+resize();
+addEventListener('resize', resize);
+function Ember() {
+  this.x=Math.random()*W; this.y=H+10;
+  this.r=Math.random()*2+0.5; this.speed=Math.random()*0.8+0.3;
+  this.drift=(Math.random()-0.5)*0.4; this.alpha=Math.random()*0.6+0.2;
+  this.decay=Math.random()*0.003+0.001; this.hue=Math.random()*30+10;
+}
+Ember.prototype.update=function(){ this.y-=this.speed; this.x+=this.drift; this.alpha-=this.decay; };
+Ember.prototype.draw=function(){
+  ctx.save(); ctx.globalAlpha=Math.max(0,this.alpha);
+  ctx.fillStyle=`hsl(${this.hue},90%,65%)`; ctx.shadowColor=`hsl(${this.hue},100%,60%)`; ctx.shadowBlur=6;
+  ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill(); ctx.restore();
+};
+const spawnRate = innerWidth < 640 ? 0.12 : 0.25;
+(function loop(){
+  ctx.clearRect(0,0,W,H);
+  if(Math.random()<spawnRate) embers.push(new Ember());
+  embers=embers.filter(e=>e.alpha>0&&e.y>-10);
+  embers.forEach(e=>{e.update();e.draw();});
+  requestAnimationFrame(loop);
+})();
+
+/* ── Scroll Reveal ── */
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+/* ── Tomoshibi Scroll ── */
+(function(){
+  const section = document.getElementById('tomoshibi');
+  if (!section) return;
+  const bgs = Array.from(section.querySelectorAll('.tomo-bg'));
+  const contents = Array.from(section.querySelectorAll('.tomo-content'));
+  const N = bgs.length;
+  let activeBgIdx = 0;
+
+  bgs[0].classList.add('active');
+  contents[0].style.display = 'block';
+  contents[0].style.opacity = '1';
+
+  function onScroll() {
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const scrolled = -rect.top;
+    const totalScroll = section.offsetHeight - vh;
+
+    if (scrolled <= 0) {
+      contents.forEach((c,i) => {
+        c.style.display = i===0 ? 'block' : 'none';
+        c.style.transform = 'translateY(0)';
+        c.style.opacity = i===0 ? '1' : '0';
+      });
+      if (activeBgIdx !== 0) {
+        bgs.forEach((bg,i) => { bg.classList.remove('active','exiting'); if(i===0) bg.classList.add('active'); });
+        activeBgIdx = 0;
+      }
+      return;
+    }
+    if (scrolled >= totalScroll) return;
+
+    const progress = scrolled / totalScroll;
+    const sceneF = progress * N;
+    const scene = Math.min(Math.floor(sceneF), N - 1);
+    const localP = sceneF - scene;
+
+    contents.forEach((c,i) => {
+      if (i === scene) {
+        c.style.display = 'block';
+        const ty = localP * vh * -1.15;
+        const op = localP < 0.6 ? 1 : Math.max(0, 1 - (localP - 0.6) / 0.4);
+        c.style.transform = `translateY(${ty}px)`;
+        c.style.opacity = String(op);
+      } else {
+        c.style.display = 'none';
+      }
+    });
+
+    const targetBg = (localP > 0.75 && scene < N-1) ? scene+1 : scene;
+    if (targetBg !== activeBgIdx) {
+      const prev = activeBgIdx;
+      bgs.forEach((bg,i) => {
+        bg.classList.remove('active','exiting');
+        if (i===targetBg) bg.classList.add('active');
+        else if (i===prev) bg.classList.add('exiting');
+      });
+      activeBgIdx = targetBg;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+
+/* ── Article Meta Translations (tag + titles) ── */
+const articleMeta = {
+  en: {
+    tag: 'Diary',
+    titles: [
+      'The Air Smelled Like Summer',
+      'The Night Air Turned to Winter',
+      'It Snowed in March',
+      'The Days Got Shorter',
+      'The Town Was Dressing for Winter',
+      'I Tried Gaming on PC — and It Worked',
+      'From Kanto to Tohoku',
+      'Year-End Shopping Chaos',
+      'Tohoku and Mount Mitsumine',
+      'First Day Above 20°C — Perfect for Hanami',
+      'Azalea Garden',
+    ],
+    excerpts: [
+      'Tried gaming on PC for the first time. My old console seemed hopeless — but the specs barely made it. It ran surprisingly well. New discovery, but games still belong on dedicated hardware.',
+      'A slow road trip from Kanto all the way to Tohoku. Stopping along the way is the whole point. Found a hot spring with an auspicious name. Old facilities, excellent water — that\'s all that matters, right?',
+      'Year-end shopping day — the annual chaos. Roads packed, stores packed, sardine conditions. 14°C, warm for the season. That alone was a saving grace.',
+      'March 8–9, a round trip between Tohoku and Kanto. Cold, with snow. Next day, Mt. Mitsumine — snow on the car and the mountain. Even coming home it felt like winter. March is a war between winter and spring.',
+      'March 29th, first time above 20°C this year. 22°C. A perfect day for hanami.',
+      'April 22nd. To the azalea garden.',
+    ],
+  },
+  fr: {
+    tag: 'Journal',
+    titles: [
+      "L'air sentait l'été",
+      "L'air de nuit s'est mis à sentir l'hiver",
+      'Il a neigé en mars',
+      'Les jours raccourcissent',
+      "La ville se préparait pour l'hiver",
+      'Jeux sur PC — et ça a marché',
+      'De Kantō à Tōhoku',
+      "Les courses de fin d'année, la bousculade",
+      'Tōhoku et le mont Mitsumine',
+      'Premier 20°C — jour de hanami parfait',
+      'Jardin de rhododendrons',
+    ],
+    excerpts: [
+      "Essayé les jeux sur PC pour la première fois. Ma vieille console semblait inutile — mais les specs passaient tout juste. Ça tourne étonnamment bien. Nouvelle découverte, mais les jeux restent sur console.",
+      "Un road trip tranquille de Kanto jusqu'au Tōhoku. S'arrêter en chemin, c'est tout l'intérêt. Trouvé des sources thermales au nom propice. Vieilles installations, eau excellente — c'est tout ce qui compte, non ?",
+      "Jour des courses de fin d'année — le chaos annuel. Routes bondées, magasins bondés, la bousculade. 14°C, doux pour la saison. C'était la seule grâce.",
+      "8-9 mars, aller-retour entre Tōhoku et Kantō. Froid et neige. Lendemain : mont Mitsumine — neige sur la voiture et sur la montagne. Même en rentrant, c'était encore l'hiver. Mars est une guerre entre hiver et printemps.",
+      '29 mars, premier 20°C de l\'année. 22°C. Un jour idéal pour le hanami.',
+      '22 avril. Direction le jardin de rhododendrons.',
+    ],
+  },
+  es: {
+    tag: 'Diario',
+    titles: [
+      'El aire olía a verano',
+      'El aire nocturno se convirtió en invierno',
+      'Nevó en marzo',
+      'Los días se acortaron',
+      'La ciudad se preparaba para el invierno',
+      'Probé jugar en PC — y funcionó',
+      'De Kanto a Tōhoku',
+      'La compra de fin de año, el caos',
+      'Tōhoku y el monte Mitsumine',
+      'El primer día por encima de 20°C — perfecto para el hanami',
+      'Jardín de azaleas',
+    ],
+    excerpts: [
+      'Probé jugar en PC por primera vez. Mi consola vieja parecía inútil — pero las specs lo permiten por los pelos. Funciona sorprendentemente bien. Nuevo descubrimiento, pero los juegos son para consolas dedicadas.',
+      'Un viaje tranquilo de Kanto al Tōhoku. Parar a lo largo del camino es el punto. Encontré un balneario con nombre auspicioso. Instalaciones viejas, agua excelente — eso es lo que importa, ¿verdad?',
+      'El día de las compras de fin de año — el caos anual. Carreteras atascadas, tiendas atascadas, como sardinas. 14°C, cálido para la época. Eso fue lo único que me salvó.',
+      '8-9 de marzo, ida y vuelta entre Tōhoku y Kantō. Frío y nevando. Al día siguiente, el monte Mitsumine — nieve en el coche y en la montaña. De vuelta a casa, seguía siendo invierno. Marzo es una guerra entre invierno y primavera.',
+      'El 29 de marzo, primera vez por encima de 20°C este año. 22°C. Un día perfecto para el hanami.',
+      '22 de abril. Al jardín de azaleas.',
+    ],
+  },
+  pt: {
+    tag: 'Diário',
+    titles: [
+      'O ar cheirava a verão',
+      'O ar da noite virou inverno',
+      'Nevou em março',
+      'Os dias encurtaram',
+      'A cidade estava se preparando para o inverno',
+      'Experimentei jogar no PC — e funcionou',
+      'De Kanto ao Tōhoku',
+      'As compras de fim de ano, a bagunça',
+      'Tōhoku e o monte Mitsumine',
+      'Primeiro dia acima de 20°C — perfeito para o hanami',
+      'Jardim de azáleas',
+    ],
+    excerpts: [
+      'Experimentei jogar no PC pela primeira vez. Minha console velha parecia inútil — mas as specs mal passaram. Funcionou surpreendentemente bem. Nova descoberta, mas jogos pertencem a consoles dedicados.',
+      'Uma viagem tranquila de Kanto até Tōhoku. Parar pelo caminho é o ponto principal. Encontrei uma fonte termal de nome auspicioso. Instalações antigas, água excelente — é só isso que importa, né?',
+      'Dia das compras de fim de ano — o caos anual. Estradas lotadas, lojas lotadas, uma bagunça total. 14°C, quente para a época. Isso foi a única graça.',
+      '8-9 de março, ida e volta entre Tōhoku e Kantō. Frio e nevando. No dia seguinte, o monte Mitsumine — neve no carro e na montanha. Mesmo ao voltar para casa, ainda parecia inverno. Março é uma guerra entre inverno e primavera.',
+      '29 de março, primeira vez acima de 20°C neste ano. 22°C. Um dia perfeito para o hanami.',
+      '22 de abril. Ao jardim de azáleas.',
+    ],
+  },
+  hi: {
+    tag: 'डायरी',
+    titles: [
+      'हवा में गर्मी की खुशबू आ गई',
+      'रात की हवा में सर्दी आ गई',
+      'मार्च में बर्फ गिरी',
+      'दिन छोटे हो गए',
+      'शहर सर्दी की तैयारी में था',
+      'PC पर गेम खेला — और चल गया',
+      'कांटो से तोहोकु तक',
+      'साल के अंत की खरीदारी, धक्का-मुक्की',
+      'तोहोकु और मित्सुमाइन पर्वत',
+      'पहली बार 20°C से ऊपर — हनामी के लिए एकदम सही',
+      'अज़ेलिया उद्यान',
+    ],
+    excerpts: [
+      'पहली बार PC पर गेम खेला। पुरानी कंसोल से लगा नहीं चलेगा — लेकिन spec देखी तो बस-बस में चल सकता था। हैरानी से अच्छे से चला। नई खोज, पर गेम असल में कंसोल पर ही खेलने चाहिए।',
+      'कांटो से तोहोकु तक धीरे-धीरे ड्राइव। रास्ते में रुकना ही मज़ा है। एक शुभ नाम वाला गर्म पानी का स्रोत मिला। पुरानी सुविधाएं, शानदार पानी — बस यही काफी है, है ना?',
+      'साल के अंत की खरीदारी — सालाना धक्का-मुक्की। सड़कें भरी, दुकानें भरी, सब ठसाठस। 14°C, मौसम के हिसाब से गर्म। बस यही राहत थी।',
+      '8-9 मार्च, तोहोकु और कांटो के बीच आना-जाना। ठंड और बर्फ। अगले दिन मित्सुमाइन पर्वत — कार पर बर्फ, पहाड़ पर भी। घर आने पर भी सर्दी थी। मार्च सर्दी और बसंत की जंग का महीना है।',
+      '29 मार्च, इस साल पहली बार 20°C से ऊपर। 22°C। हनामी के लिए एकदम सही दिन।',
+      '22 अप्रैल। अज़ेलिया उद्यान की ओर।',
+    ],
+  },
+  ar: {
+    tag: 'يوميات',
+    titles: [
+      'الهواء أصبح يشمّ رائحة الصيف',
+      'هواء الليل أصبح شتاءً',
+      'تساقط الثلج في مارس',
+      'الأيام أصبحت أقصر',
+      'المدينة كانت تستعد للشتاء',
+      'جربت اللعب على الحاسوب — ونجح الأمر',
+      'من كانتو إلى توهوكو',
+      'تسوق نهاية العام في الزحام',
+      'توهوكو وجبل ميتسومين',
+      'أول يوم فوق 20°C — مثالي للهاناميو',
+      'حديقة الأزاليا',
+    ],
+    excerpts: [
+      'جربت اللعب على الحاسوب للمرة الأولى. ظننت أن جهازي القديم لن يستطيع — لكن المواصفات كانت كافية بالكاد. يعمل بشكل مدهش. اكتشاف جديد، لكن الألعاب تنتمي إلى أجهزة الألعاب المخصصة.',
+      'رحلة قيادة هادئة من كانتو إلى توهوكو. التوقف في الطريق هو المتعة الحقيقية. وجدت ينبوعاً ساخناً باسم متفائل. مرافق قديمة، ماء رائع — هذا هو المعيار، أليس كذلك؟',
+      'يوم التسوق في نهاية العام — الفوضى السنوية. الطرق مزدحمة، المتاجر مزدحمة، كل شيء مكتظ. 14°C، دافئ للموسم. كان هذا وحده نعمة.',
+      '8-9 مارس، ذهاباً وإياباً بين توهوكو وكانتو. بارد وثلجي. في اليوم التالي، جبل ميتسومين — ثلج على السيارة وعلى الجبل. حتى عند العودة، كان الشتاء لا يزال هناك. مارس هو حرب بين الشتاء والربيع.',
+      'يوم 29 مارس، أول يوم فوق 20°C هذا العام. 22°C. يوم مثالي للهاناميو.',
+      '22 أبريل. إلى حديقة الأزاليا.',
+    ],
+  },
+  bn: {
+    tag: 'ডায়েরি',
+    titles: [
+      'বাতাসে গ্রীষ্মের গন্ধ ছড়িয়ে পড়ল',
+      'রাতের বাতাস শীতের হয়ে গেল',
+      'মার্চে তুষারপাত হল',
+      'দিন ছোট হয়ে গেল',
+      'শহর শীতের প্রস্তুতি নিচ্ছিল',
+      'PC-তে গেম খেললাম — আর চলল',
+      'কান্তো থেকে তোহোকু',
+      'বছর শেষের কেনাকাটা, ঠেলাঠেলি',
+      'তোহোকু ও মিতসুমিনে পর্বত',
+      'প্রথমবার 20°C-এর উপরে — হানামির জন্য আদর্শ',
+      'আজালিয়া উদ্যান',
+    ],
+    excerpts: [
+      'প্রথমবার PC-তে গেম খেললাম। পুরনো কনসোল থেকে ভেবেছিলাম চলবে না — কিন্তু স্পেক দেখে কোনোমতে চলে। আশ্চর্যজনকভাবে ভালোই চলল। নতুন আবিষ্কার, কিন্তু গেম তো ডেডিকেটেড হার্ডওয়্যারেই।',
+      'কান্তো থেকে তোহোকু পর্যন্ত ধীরে ধীরে গাড়ি চালিয়ে যাওয়া। পথে থামাই আসল মজা। শুভ নামের একটি গরম জলের উৎস খুঁজে পেলাম। পুরনো সুযোগ-সুবিধা, চমৎকার জল — এটাই তো মানদণ্ড, তাই না?',
+      'বছর শেষের কেনাকাটার দিন — বার্ষিক ঠেলাঠেলি। রাস্তা ঠাসা, দোকান ঠাসা, গিজগিজ করছে সব। 14°C, এই সময়ের জন্য উষ্ণ। শুধু এটাই ছিল স্বস্তি।',
+      '8-9 মার্চ, তোহোকু ও কান্তোর মধ্যে আসা-যাওয়া। ঠান্ডা ও তুষারপাত। পরের দিন মিতসুমিনে পর্বত — গাড়িতে বরফ, পাহাড়েও বরফ। বাড়ি ফিরেও শীতই মনে হল। মার্চ শীত ও বসন্তের যুদ্ধের মাস।',
+      '২৯ মার্চ, এ বছর প্রথমবার 20°C-এর উপরে। 22°C। হানামির জন্য আদর্শ দিন।',
+      '২২ এপ্রিল। আজালিয়া উদ্যানে।',
+    ],
+  },
+  ru: {
+    tag: 'Дневник',
+    titles: [
+      'Воздух запах летом',
+      'Ночной воздух стал зимним',
+      'В марте выпал снег',
+      'Дни стали короче',
+      'Город готовился к зиме',
+      'Попробовал игры на ПК — и всё заработало',
+      'Из Канто в Тохоку',
+      'Предновогодний шопинг в толпе',
+      'Тохоку и гора Мицумине',
+      'Первый день выше 20°C — идеально для ханами',
+      'Сад азалий',
+    ],
+    excerpts: [
+      'Попробовал игры на ПК впервые. Думал, старая консоль не потянет — но характеристики еле-еле подошли. Работает удивительно хорошо. Новое открытие, но игры всё равно принадлежат специализированным консолям.',
+      'Неспешная поездка из Канто в Тохоку. Останавливаться по пути — вот в чём весь смысл. Нашёл горячий источник с обнадёживающим названием. Старые удобства, прекрасная вода — только это и важно, правда?',
+      'День предновогодних покупок — ежегодный хаос. Дороги забиты, магазины забиты, давка. 14°C, тепло для этого времени. Только это и спасало.',
+      '8-9 марта, туда-обратно между Тохоку и Канто. Холодно и снег. На следующий день — гора Мицумине, снег на машине и на горе. Даже вернувшись домой, всё ещё чувствовалась зима. Март — это война зимы и весны.',
+      '29 марта, впервые в этом году выше 20°C. 22°C. Идеальный день для ханами.',
+      '22 апреля. В сад азалий.',
+    ],
+  },
+  id: {
+    tag: 'Jurnal',
+    titles: [
+      'Udara Berbau Musim Panas',
+      'Udara Malam Berubah Menjadi Musim Dingin',
+      'Salju Turun di Bulan Maret',
+      'Hari Mulai Memendek',
+      'Kota Bersiap untuk Musim Dingin',
+      'Mencoba Main Game di PC — dan Berhasil',
+      'Dari Kanto ke Tohoku',
+      'Belanja Akhir Tahun di Tengah Keramaian',
+      'Tohoku dan Gunung Mitsumine',
+      'Pertama Kali di Atas 20°C — Sempurna untuk Hanami',
+      'Taman Azalea',
+    ],
+    excerpts: [
+      'Mencoba main game di PC untuk pertama kali. Konsolku sudah tua jadi kukira tidak akan bisa — tapi speknya pas-pasan bisa. Berjalan dengan mengejutkan baik. Penemuan baru, tapi game tetap milik konsol khusus.',
+      'Perjalanan santai dari Kanto ke Tohoku. Singgah di jalan adalah poin utamanya. Menemukan sumber air panas dengan nama yang menggembirakan. Fasilitas tua, air luar biasa — hanya itu yang penting, betul kan?',
+      'Hari belanja akhir tahun — kekacauan tahunan. Jalan macet, toko penuh sesak, seperti ikan sarden. 14°C, hangat untuk musim ini. Hanya itu yang menyelamatkan.',
+      '8-9 Maret, perjalanan pulang pergi antara Tohoku dan Kanto. Dingin dan bersalju. Hari berikutnya, Gunung Mitsumine — salju di mobil dan di gunung. Bahkan pulang ke rumah, masih terasa seperti musim dingin. Maret adalah perang antara musim dingin dan semi.',
+      '29 Maret, pertama kali di atas 20°C tahun ini. 22°C. Hari yang sempurna untuk hanami.',
+      '22 April. Ke taman azalea.',
+    ],
+  },
+  de: {
+    tag: 'Tagebuch',
+    titles: [
+      'Die Luft roch nach Sommer',
+      'Die Nachtluft wurde zum Winter',
+      'Im März hat es geschneit',
+      'Die Tage wurden kürzer',
+      'Die Stadt bereitete sich auf den Winter vor',
+      'Ich probierte PC-Gaming — und es lief',
+      'Von Kanto nach Tōhoku',
+      'Jahresend-Einkäufe im Gedränge',
+      'Tōhoku und der Berg Mitsumine',
+      'Erster Tag über 20°C — perfekt für Hanami',
+      'Azaleengarten',
+    ],
+    excerpts: [
+      'PC-Gaming zum ersten Mal ausprobiert. Meine Konsole ist alt, ich dachte, sie würde nichts laufen lassen — aber die Specs reichten gerade so. Läuft überraschend gut. Neue Entdeckung, aber Spiele gehören auf dedizierte Konsolen.',
+      'Eine gemächliche Fahrt von Kanto bis nach Tohoku. Unterwegs anzuhalten ist der eigentliche Sinn. Ein heißes Quellbad mit einem verheißungsvollen Namen gefunden. Alte Einrichtungen, ausgezeichnetes Wasser — nur das zählt, oder?',
+      'Einkaufstag zum Jahresende — das jährliche Chaos. Straßen voll, Läden voll, gedrängt voll. 14°C, warm für die Jahreszeit. Das allein war eine Gnade.',
+      '8.-9. März, Hin- und Rückreise zwischen Tohoku und Kanto. Kalt und Schnee. Am nächsten Tag der Berg Mitsumine — Schnee auf dem Auto und auf dem Berg. Selbst zu Hause fühlte es sich noch nach Winter an. März ist ein Krieg zwischen Winter und Frühling.',
+      '29. März, erstmals über 20°C in diesem Jahr. 22°C. Ein perfekter Tag für Hanami.',
+      '22. April. In den Azaleengarten.',
+    ],
+  },
+  pl: {
+    tag: 'Dziennik',
+    titles: [
+      'Powietrze pachniało latem',
+      'Nocne powietrze stało się zimowe',
+      'W marcu padał śnieg',
+      'Dni się skróciły',
+      'Miasto szykowało się na zimę',
+      'Spróbowałem grać na PC — i działało',
+      'Z Kanto do Tōhoku',
+      'Zakupy końcowo-roczne w tłoku',
+      'Tōhoku i góra Mitsumine',
+      'Pierwszy dzień powyżej 20°C — idealny na hanami',
+      'Ogród azalii',
+    ],
+    excerpts: [
+      'Spróbowałem grać na PC po raz pierwszy. Mam konsolę, ale jest stara, myślałem że nic nie uruchomi — ale specyfikacje ledwo wystarczyły. Działa zaskakująco dobrze. Nowe odkrycie, ale gry nadal należą do dedykowanych konsol.',
+      'Spokojna podróż z Kanto do Tohoku. Zatrzymywanie się po drodze to sedno sprawy. Znalazłem gorące źródło o pomyślnej nazwie. Stare udogodnienia, doskonała woda — tylko to ma znaczenie, prawda?',
+      'Dzień zakupów końcowo-rocznych — coroczny chaos. Drogi zakorkowane, sklepy zapchane, ścisk. 14°C, ciepło jak na tę porę roku. To jedyne co ratowało.',
+      '8-9 marca, podróż tam i z powrotem między Tohoku a Kanto. Zimno i śnieg. Następnego dnia góra Mitsumine — śnieg na samochodzie i na górze. Nawet wracając do domu, wciąż czułem zimę. Marzec to wojna między zimą a wiosną.',
+      '29 marca, pierwszy raz powyżej 20°C w tym roku. 22°C. Idealny dzień na hanami.',
+      '22 kwietnia. Do ogrodu azalii.',
+    ],
+  },
+  ko: {
+    tag: '일기',
+    titles: [
+      '공기의 냄새가, 여름으로 바뀌었다',
+      '밤공기가, 겨울 냄새로 바뀌었다',
+      '3월에, 눈이 쌓였다',
+      '해가 짧아졌다',
+      '거리가, 겨울 채비를 하고 있었다',
+      'PC로 게임을 했더니, 돌아갔다',
+      '간토에서 도호쿠로',
+      '연말 장보기, 아수라장',
+      '도호쿠와 미쓰미네산',
+      '처음 20℃ 넘은 날, 꽃놀이 날씨',
+      '진달래 공원',
+    ],
+    excerpts: [
+      'PC로 처음 게임을 했다. 오래됐으니 안 돌아갈 거라고 지레짐작했는데, 스펙이 간신히 됐다. 의외로 잘 돌아간다. 새로운 발견이지만, 기본적으로 게임은 전용 하드웨어에서 한다.',
+      '간토에서 도호쿠 중간까지 느릿느릿 달리며 귀성. 중간에 들르면서 가는 게 정답이다. 좋은 이름의 온천을 발견해 들렀다. 시설은 오래됐지만 물은 좋다. 온천은 물로 판단하는 것——맞지?',
+      '연말 장보기 날——이것도 대행사다. 도로는 막히고, 가게는 북적이고, 아수라장. 14℃, 낮에는 따뜻했다. 그게 그나마 구원이었다.',
+      '3월 8-9일, 도호쿠와 간토 왕복. 춥고 눈이 내렸다. 다음 날 미쓰미네산에 아침 일찍부터 갔더니, 차에도 눈이 남아 있고 산에도 적설. 밤에 귀가해도 여전히 겨울이었다. 3월은 겨울과 봄이 싸우는 달이다.',
+      '3월 29일, 올해 처음 20℃ 초과. 22℃. 꽃놀이 날씨란 이날을 위해 있는 말이다.',
+      '4월 22일. 진달래 공원으로.',
+    ],
+  },
+  zh: {
+    tag: '日记',
+    titles: [
+      '空气的气味，变成了夏天',
+      '夜晚的空气，变成了冬天的味道',
+      '三月，下雪了',
+      '白昼变短了',
+      '街道，在为冬天做准备',
+      '用电脑玩了游戏，竟然跑起来了',
+      '从关东到东北',
+      '年末大采购，人山人海',
+      '东北与三峰山',
+      '今年首次超过20°C，赏花好天气',
+      '杜鹃花园',
+    ],
+    excerpts: [
+      '第一次用电脑玩了游戏。以为旧设备肯定跑不起来，仔细查了配置才发现勉强够用。出乎意料地运行流畅。新发现，但基本还是用专用主机玩游戏。',
+      '从关东到东北中部，慢悠悠地开车回老家。边走边停才是正确的方式。途中发现一个名字吉利的温泉，顺道去了。设施虽旧，但泉水很好。温泉不就是要看泉水的吗？',
+      '年末大采购日——这也是年度大事。路上堵，店里挤，人山人海。14℃，白天很暖和。这是唯一的安慰。',
+      '3月8-9日，东北与关东往返。寒冷，飘着雪。第二天一早就去了三峰山，车上还有残雪，山上也有积雪。晚上回到家，还是冬天的感觉。3月是冬天和春天交战的月份。',
+      '3月29日，今年首次超过20°C。22°C。赏花好天气这个词，就是为这一天准备的。',
+      '4月22日。去杜鹃花园。',
+    ],
+  },
+  yue: {
+    tag: '日記',
+    titles: [
+      '空氣嘅氣味，變成咗夏天',
+      '夜晚嘅空氣，變成咗冬天嘅味道',
+      '三月，落雪喇',
+      '白晝變短咗',
+      '街道，喺為冬天做準備',
+      '用電腦玩咗遊戲，竟然跑得起',
+      '由關東去東北',
+      '年末大採購，人山人海',
+      '東北與三峰山',
+      '今年首次超過20°C，賞花好天氣',
+      '杜鵑花園',
+    ],
+    excerpts: [
+      '第一次用電腦玩咗遊戲。以為舊設備一定跑唔起，仔細查咗配置先發現勉強夠用。出乎意料噉運行流暢。新發現，但基本仲係用專用主機玩遊戲。',
+      '由關東去到東北中部，慢慢噉開車返鄉下。邊行邊停先係正確嘅方式。途中發現一個名字好意頭嘅溫泉，順道去咗。設施雖然舊，但泉水好好。溫泉係咪要睇泉水㗎？',
+      '年末大採購日——呢個都係年度大事。路上塞車，店裏擠滿人，人山人海。14°C，白天好暖。呢個係唯一嘅安慰。',
+      '3月8-9日，東北同關東往返。好凍，仲落緊雪。第二日一早去咗三峰山，車上仲有殘雪，山上都有積雪。晚上返到屋企，仲係冬天嘅感覺。3月係冬天同春天交戰嘅月份。',
+      '3月29日，今年首次超過20°C。22°C。賞花好天氣呢個詞，就係為呢日準備嘅。',
+      '4月22日。去杜鵑花園。',
+    ],
+  },
+};
+
+/* ── Article Text Translations ── */
+const articleTextBlocks = {
+  en: {
+    0:[`Leaves? Green? Soil? That fresh, grassy smell?\nEvery year I search for the right words and never find them.\nBut every year, without fail, I notice it.\nHere comes the heat again. This year too.\nHeat, please go easy on me.\nI really don't want to fight with you.`],
+    1:[`At night the air outside changed — winter arrived. Is this the beginning?\nWhat is the smell of winter air? I still can't explain it.\nLike the green rawness of summer suddenly gone. Like the air itself suddenly dried out.\nAs hopeless with words as ever.`],
+    2:[`I had just written "spring is coming soon" not long ago.\nAnd today of all days — snow. More than five centimeters.\nWay too far back into winter. Snow, go fall on the ski slopes.\nYou don't belong in the Kanto plain at this time of year.`],
+    3:[`Around two days ago I had the feeling the days might be getting shorter.\nAnd yet we're in the thick of midsummer heat.\nThe body knows the seasons more honestly than any calendar.`],
+    4:[`It was seriously cold outside.\nWalking through town, everyone had switched to heavy coats without me noticing.\nEvery year when this season arrives, I think the same thing — glad, and sad.`],
+    5:[`Played games on PC for the first time tonight.\nI have a gaming console, but it's old —\nI just assumed it wouldn't run anything.\nThen I checked the specs —\nbarely makes it! No way. Let's try it.\nIt actually runs surprisingly well. Shocked.\nNew discovery — but fundamentally, games belong on dedicated hardware.`],
+    6:[`Look at the outside temperature on the rental car's instrument panel\nWhere are we???`,`Sugao Service Area — This was the only sign I could get a photo of here...`,`A forest road near my parents' home`,`Autumn leaves already starting — and it's only August`,`I found a hot spring with the most auspicious name.\nStopped in. Old facilities, but excellent water.\nA hot spring should be judged by its water... right?`],
+    7:[`Year-end shopping day — a major annual event.\nThe roads are packed, the stores are packed, sardine conditions.\n14°C, warm for the season. That alone was a saving grace.`],
+    8:[`March 8th\nOn the way to Tohoku\nIt wasn't cold`,`March 10th\nHeaded to Mt. Mitsumine first thing in the morning — as you can see`,`Snow remained on the mountain too`,`March is the month where winter and spring are at war`],
+    9:[`First time above 20°C this year — 22°C.`],
+  },
+  fr: {
+    0:[`L'odeur des feuilles ? Du vert ? De la terre ? Cette odeur fraîche et végétale ?\nChaque année je cherche les mots justes, et chaque année je n'en trouve pas.\nMais chaque année, sans faute, je le remarque.\nVoilà la chaleur qui revient. Cette année aussi.\nChaleur, sois clémente avec moi.\nJe ne veux vraiment pas me battre avec toi.`],
+    1:[`Le soir, l'odeur de l'air a changé — l'hiver arrive. Est-ce le début ?\nComment décrire l'odeur de l'air d'hiver ? Je n'arrive toujours pas à l'expliquer.\nComme si la verdeur âcre de l'été avait soudain disparu. Comme si l'air lui-même s'était asséché.\nToujours aussi impuissant avec les mots.`],
+    2:[`Je venais juste d'écrire « le printemps approche » il y a peu.\nEt aujourd'hui — de la neige. Plus de cinq centimètres.\nTrop retour en hiver. Neige, va tomber sur les pistes de ski.\nTu n'as rien à faire dans la plaine du Kantō à cette époque.`],
+    3:[`Depuis avant-hier, j'ai l'impression que les jours raccourcissent.\nEt pourtant, nous sommes en pleine canicule estivale.\nLe corps connaît les saisons plus honnêtement que n'importe quel calendrier.`],
+    4:[`Il faisait vraiment froid dehors.\nEn me promenant en ville, tout le monde avait troqué ses vêtements légers pour des manteaux chauds.\nChaque année quand cette saison revient, je pense la même chose — heureux, et triste.`],
+    5:[`Ce soir, j'ai joué à un jeu sur PC pour la première fois.\nJ'ai une console, mais elle est vieille —\nje pensais qu'elle ne ferait tourner rien.\nJ'ai vérifié les specs —\nça passe, tout juste ! Sérieusement ? Essayons.\nÇa tourne étonnamment bien. Choqué.\nNouvelle découverte — mais fondamentalement, les jeux, c'est sur console.`],
+    6:[`Regardez la température extérieure sur le tableau de bord de la voiture de location\nOn est où ???`,`Aire de service de Sugao — C'était le seul panneau ici dont j'ai pu prendre une photo...`,`Une route forestière près de la maison de mes parents`,`Déjà les feuilles d'automne — et on est en août`,`J'ai trouvé des sources thermales au nom fort propice.\nJe me suis arrêté. Les installations sont vieilles, mais l'eau est excellente.\nOn juge une source thermale à son eau... non ?`],
+    7:[`Jour des courses de fin d'année — un grand événement annuel.\nLes routes sont bondées, les magasins sont bondés, c'est la bousculade.\n14°C, doux pour la saison. C'était la seule grâce.`],
+    8:[`8 mars\nEn route vers le Tōhoku\nIl ne faisait pas froid`,`10 mars\nParti tôt le matin pour le mont Mitsumine — comme vous pouvez le voir`,`De la neige restait aussi sur la montagne`,`Mars est le mois où l'hiver et le printemps sont en guerre`],
+    9:[`Première fois au-dessus de 20°C cette année — 22°C.`],
+  },
+  es: {
+    0:[`¿El olor de las hojas? ¿Del verde? ¿De la tierra? ¿Ese olor fresco y vegetal?\nCada año busco las palabras exactas y cada año no las encuentro.\nPero cada año, sin falta, lo noto.\nAquí viene el calor otra vez. Este año también.\nCalor, sé amable conmigo.\nDe verdad no quiero pelearme contigo.`],
+    1:[`De noche el olor del aire cambió a invierno. ¿Será el comienzo?\nCómo describir el olor del aire invernal, no sé explicarlo todavía.\nComo si el aroma verde y crudo del verano hubiera desaparecido de repente. Como si el aire mismo se hubiera secado.\nSigo siendo tan torpe con las palabras como siempre.`],
+    2:[`Hace poco escribí "ya se acerca la primavera".\nY hoy, precisamente — nieve. Más de cinco centímetros.\nDemasiado regreso al invierno. Nieve, ve a caer en las pistas de esquí.\nNo tienes sitio en la llanura de Kantō en esta época del año.`],
+    3:[`Desde anteayer, tengo la sensación de que los días se acortan.\nY aún estamos en plena ola de calor estival.\nEl cuerpo conoce las estaciones más honestamente que cualquier calendario.`],
+    4:[`Hacía un frío de verdad afuera.\nCaminando por la ciudad, todos se habían puesto abrigos gruesos sin que me diera cuenta.\nCada año, cuando llega esta temporada, pienso lo mismo: alegre y triste.`],
+    5:[`Esta noche jugué a videojuegos en el PC por primera vez.\nTengo una consola, pero es vieja —\nasumí que no podría ejecutar nada.\nEntonces comprobé las especificaciones —\n¡los specs lo permiten por los pelos! ¿En serio? Vamos a intentarlo.\nFunciona sorprendentemente bien. Alucinado.\nNuevo descubrimiento — pero básicamente, los juegos son para consolas dedicadas.`],
+    6:[`Fíjate en la temperatura exterior en el cuadro de mandos del coche de alquiler\n¿Dónde estamos???`,`Área de servicio Sugao — Era la única señal de la que pude sacar una foto aquí...`,`Un camino forestal cerca de la casa de mis padres`,`Follaje de otoño ya en agosto`,`Encontré un balneario de lo más auspicioso.\nParé. Las instalaciones son viejas, pero el agua es excelente.\nUn balneario se juzga por su agua... ¿verdad?`],
+    7:[`El día de las compras de fin de año — un gran evento anual.\nLas carreteras atascadas, las tiendas atascadas, todo como sardinas en lata.\n14°C, cálido para la época. Eso fue lo único que me salvó.`],
+    8:[`8 de marzo\nDe camino a Tōhoku\nNo hacía frío`,`10 de marzo\nFui al monte Mitsumine a primera hora — como pueden ver`,`También había nieve en la montaña`,`Marzo es el mes en que el invierno y la primavera están en guerra`],
+    9:[`Primera vez por encima de 20°C este año — 22°C.`],
+  },
+  pt: {
+    0:[`Cheiro de folhas? De verde? De terra? Aquele cheiro fresco e vegetal?\nCada ano procuro as palavras certas e cada ano não as encontro.\nMas cada ano, sem falta, eu percebo.\nLá vem o calor de novo. Mais um ano.\nCalor, seja gentil comigo.\nEu realmente não quero brigar com você.`],
+    1:[`À noite o cheiro do ar lá fora virou inverno. Será que está começando?\nO que é o cheiro do ar de inverno? Ainda não consigo explicar.\nComo se o cheiro verde e cru do verão tivesse sumido de repente. Como se o próprio ar tivesse secado.\nAinda tão sem palavras quanto sempre.`],
+    2:[`Não faz muito tempo escrevi "a primavera já está chegando".\nE hoje, de todos os dias — neve. Mais de cinco centímetros.\nInverno demais de volta. Neve, vá cair nas pistas de esqui.\nVocê não pertence à planície de Kantō nessa época do ano.`],
+    3:[`Desde anteontem, tenho a impressão de que os dias estão encurtando.\nE ainda estamos no auge do calor do verão.\nO corpo conhece as estações mais honestamente do que qualquer calendário.`],
+    4:[`Estava muito frio lá fora.\nCaminhando pela cidade, todos tinham trocado para casacos pesados sem que eu percebesse.\nTodo ano quando essa estação chega, penso a mesma coisa — feliz e triste.`],
+    5:[`Joguei videogame no PC pela primeira vez essa noite.\nTenho um console, mas é velho —\nassumi que não rodaria nada.\nAí verifiquei as especificações —\nquase passa! Sério? Vamos tentar.\nRoda surpreendentemente bem. Chocado.\nNova descoberta — mas no fundo, jogos são para consoles dedicados.`],
+    6:[`Veja a temperatura exterior no painel do carro alugado\nOnde estamos???`,`Área de serviço Sugao — Esta era a única placa que dava para fotografar aqui...`,`Uma estrada florestal perto da casa dos meus pais`,`Folhagem de outono e ainda é agosto`,`Encontrei uma fonte termal de nome muito auspicioso.\nParei lá. As instalações são antigas, mas a água é excelente.\nUma fonte termal deve ser julgada pela água... né?`],
+    7:[`Dia das compras de fim de ano — um grande evento anual.\nAs estradas lotadas, as lojas lotadas, tudo uma bagunça.\n14°C, quente para a época. Isso foi a única graça.`],
+    8:[`8 de março\nA caminho de Tōhoku\nNão estava frio`,`10 de março\nFui ao monte Mitsumine bem cedo — como podem ver`,`Neve na montanha também`,`Março é o mês em que o inverno e a primavera estão em guerra`],
+    9:[`Primeira vez acima de 20°C este ano — 22°C.`],
+  },
+  hi: {
+    0:[`पत्तों की खुशबू? हरियाली? मिट्टी? वो ताज़ी घास जैसी गंध?\nहर साल सही शब्द ढूंढता हूँ, और हर साल नहीं मिलते।\nलेकिन हर साल, बिना चूके, मैं इसे महसूस करता हूँ।\nआ गई गर्मी फिर से। इस साल भी।\nगर्मी, मुझ पर थोड़ी रहम करो।\nमैं तुमसे लड़ना नहीं चाहता।`],
+    1:[`रात को बाहर की हवा की खुशबू बदल गई — सर्दी आ गई। क्या यही शुरुआत है?\nसर्दी की हवा की खुशबू क्या होती है? अब भी समझा नहीं पाता।\nजैसे गर्मी की हरी कच्ची गंध अचानक गायब हो गई। जैसे हवा खुद अचानक सूख गई।\nशब्दों के मामले में आज भी उतना ही बेबस हूँ।`],
+    2:[`कुछ ही दिन पहले लिखा था "लगता है अब बसंत आने वाला है"।\nऔर आज — बर्फ। पाँच सेंटीमीटर से भी ज़्यादा।\nसर्दी वापस आ गई बहुत दूर से। बर्फ, जाओ स्की रिसॉर्ट में बरसो।\nकांटो के मैदान में इस वक्त तुम्हारी कोई ज़रूरत नहीं।`],
+    3:[`परसों से लगा कि दिन छोटे होने लगे हैं।\nऔर हम अभी गर्मी के बीचोबीच हैं।\nशरीर किसी भी कैलेंडर से ज़्यादा ईमानदारी से मौसम जानता है।`],
+    4:[`बाहर सच में ठंड थी।\nशहर में चलते हुए देखा — सब कब से मोटे कपड़ों में आ गए थे।\nहर साल यह मौसम आता है तो मन में यही सोचता हूँ — खुश भी, उदास भी।`],
+    5:[`आज रात पहली बार PC पर गेम खेला।\nगेमिंग कंसोल है, लेकिन पुराना है —\nसोचा था चलेगा नहीं।\nफिर spec देखी —\nबस-बस में चल सकता है! सच में? चलो कोशिश करते हैं।\nहैरानी की बात — अच्छे से चला।\nनई खोज तो हुई — लेकिन असल में, गेम तो कंसोल पर ही खेलने चाहिए।`],
+    6:[`किराये की गाड़ी के डैशबोर्ड पर बाहरी तापमान देखो\nहम कहाँ हैं???`,`सुगाओ सर्विस एरिया — यहाँ बस यही एक बोर्ड था जिसकी फोटो ले सका...`,`माँ-बाप के घर के पास एक जंगली रास्ता`,`अगस्त में ही पत्तियाँ पहले से रंगीन हो गईं`,`एक बड़े ही शुभ नाम वाला गर्म पानी का स्रोत मिला।\nरुका। सुविधाएं पुरानी थीं, लेकिन पानी बहुत अच्छा था।\nगर्म पानी का स्रोत पानी से ही परखा जाता है... है ना?`],
+    7:[`साल के अंत की खरीदारी का दिन — एक बड़ा सालाना आयोजन।\nसड़कें भरी हुई, दुकानें भरी हुई, सब कुछ ठसाठस।\n14°C, मौसम के हिसाब से गर्म। बस यही राहत थी।`],
+    8:[`8 मार्च\nतोहोकु की ओर रास्ते में\nठंड नहीं थी`,`10 मार्च\nसुबह-सुबह मित्सुमाइन पहाड़ गया — जैसा आप देख सकते हैं`,`पहाड़ पर भी बर्फ थी`,`मार्च वह महीना है जब सर्दी और बसंत में जंग होती है`],
+    9:[`इस साल पहली बार 20°C से ऊपर — 22°C।`],
+  },
+  ar: {
+    0:[`رائحة الأوراق؟ رائحة الخضرة؟ رائحة التراب؟ تلك الرائحة العشبية المنعشة؟\nكل عام أبحث عن الكلمات المناسبة ولا أجدها.\nلكنني ألاحظها دائماً، كل عام دون استثناء.\nها هو الحر يعود. هذا العام أيضاً.\nأيها الحر، تعامل معي بلطف.\nأنا لا أريد أن أتشاجر معك.`],
+    1:[`في الليل تغيرت رائحة الهواء الخارجي — جاء الشتاء. هل هذه البداية؟\nما هي رائحة هواء الشتاء؟ لا أزال عاجزاً عن وصفها.\nكأن الرائحة الخضراء الخام للصيف اختفت فجأة. كأن الهواء نفسه جفّ فجأة.\nلا أزال عاجزاً عن التعبير كما كنت دائماً.`],
+    2:[`كنت قد كتبت منذ قليل "يبدو أن الربيع قادم قريباً".\nواليوم بالذات — ثلج. أكثر من خمسة سنتيمترات.\nعودة إلى الشتاء أكثر من اللازم. أيها الثلج، اذهب وأمطر على منتجعات التزلج.\nأنت لا تنتمي إلى سهل كانتو في هذا الوقت من العام.`],
+    3:[`منذ أول أمس شعرت أن الأيام ربما تقصر.\nومع ذلك نحن في قلب حرارة الصيف.\nالجسم يعرف الفصول بصدق أكبر من أي تقويم.`],
+    4:[`كان البرد حاداً حقاً في الخارج.\nأثناء التجول في المدينة، كان الجميع قد تحولوا إلى ملابس دافئة ثقيلة دون أن أشعر.\nكل عام حين يأتي هذا الموسم، أفكر في نفس الشيء — فرحٌ وحزن.`],
+    5:[`اللعب على الحاسوب للمرة الأولى الليلة.\nلدي وحدة ألعاب، لكنها قديمة —\nافترضت أنها لن تشغّل أي شيء.\nثم تحققت من المواصفات —\nتمر بالكاد! لا بجد؟ لنجرب.\nتعمل بشكل جيد بشكل مفاجئ. مذهول.\nاكتشاف جديد — لكن في الأساس، الألعاب تنتمي إلى أجهزة الألعاب المخصصة.`],
+    6:[`انظر إلى درجة الحرارة الخارجية على لوحة قيادة السيارة المستأجرة\nأين نحن???`,`محطة خدمة سوغاو — كانت اللوحة الوحيدة هنا التي أمكنني تصويرها...`,`طريق غابي بالقرب من بيت والديّ`,`أوراق الخريف مبكرة — ونحن في أغسطس فقط`,`وجدت ينبوعاً ساخناً يحمل اسماً في غاية التفاؤل.\nتوقفت. المرافق قديمة، لكن الماء رائع.\nينبوع الماء الساخن يُقاس بجودة مائه... أليس كذلك؟`],
+    7:[`يوم التسوق في نهاية العام — حدث سنوي كبير.\nالطرق مزدحمة، المتاجر مزدحمة، كل شيء مكتظ.\n14 درجة مئوية، دافئ لهذا الوقت. كان هذا وحده نعمة.`],
+    8:[`8 مارس\nفي الطريق إلى توهوكو\nلم يكن الجو بارداً`,`10 مارس\nتوجهت إلى جبل ميتسومين في الصباح الباكر — كما ترون`,`وثلج على الجبل أيضاً`,`مارس هو الشهر الذي يتحارب فيه الشتاء والربيع`],
+    9:[`أول مرة يتجاوز 20°C هذا العام — 22°C.`],
+  },
+  bn: {
+    0:[`পাতার গন্ধ? সবুজের গন্ধ? মাটির গন্ধ? সেই তাজা ঘাসের মতো গন্ধ?\nপ্রতি বছর সঠিক কথা খুঁজি, কিন্তু পাই না।\nতবুও প্রতি বছর, অবশ্যই, টের পাই।\nআবার গরম আসছে। এ বছরও।\nগরম, আমার সাথে একটু নরম থেকো।\nতোমার সাথে ঝগড়া করতে চাই না।`],
+    1:[`রাতে বাইরের বাতাসের গন্ধ শীতের মতো হয়ে গেল। এটাই কি শুরু?\nশীতের বাতাসের গন্ধ কী? এখনো বোঝাতে পারি না।\nযেন গ্রীষ্মের সবুজ কাঁচা গন্ধ হঠাৎ চলে গেল। যেন বাতাস নিজেই হঠাৎ শুকিয়ে গেল।\nশব্দ নিয়ে এখনো সেই একই অসহায়ত্ব।`],
+    2:[`কিছুদিন আগেই লিখেছিলাম "বসন্ত আসতে চলেছে"।\nআর আজ — তুষারপাত। পাঁচ সেন্টিমিটারেরও বেশি।\nঅনেক বেশি শীতে ফিরে গেল। তুষার, স্কি রিসোর্টে গিয়ে পড়।\nকান্তো সমভূমিতে এই সময়ে তুমি মানাও না।`],
+    3:[`পরশু থেকে মনে হচ্ছে দিন ছোট হতে শুরু করেছে।\nথেচা গরমের মধ্যে থাকতে থাকতেও এটা টের পাচ্ছি।\nযেকোনো ক্যালেন্ডারের চেয়ে শরীর বেশি সৎভাবে ঋতু চেনে।`],
+    4:[`বাইরে সত্যিই ঠান্ডা ছিল।\nশহরে হাঁটতে গিয়ে দেখলাম সবাই কখন মোটা জ্যাকেট পরে নিয়েছে।\nপ্রতি বছর এই মৌসুম এলে একই কথা মনে হয় — আনন্দ আর বিষণ্ণতা।`],
+    5:[`আজ রাতে প্রথমবার PC-তে গেম খেললাম।\nগেমিং কনসোল আছে, কিন্তু পুরনো —\nভেবেছিলাম কিছুই চলবে না।\nতারপর স্পেক দেখলাম —\nকোনোমতে চলবে! সত্যি? চেষ্টা করে দেখি।\nআশ্চর্যজনকভাবে ভালোই চলছে। অবাক।\nনতুন আবিষ্কার — তবু মূলত, গেম তো ডেডিকেটেড হার্ডওয়্যারেই খেলতে হয়।`],
+    6:[`ভাড়ার গাড়ির ড্যাশবোর্ডে বাইরের তাপমাত্রা দেখো\nআমরা কোথায়???`,`সুগাও সার্ভিস এরিয়া — এখানে শুধু এই সাইনটারই ছবি তোলা যেত...`,`বাবা-মায়ের বাড়ির কাছের বনের রাস্তা`,`আগস্টেই শরতের পাতা রঙ বদলাতে শুরু করেছে`,`একটি অত্যন্ত শুভ নামের গরম জলের উৎস খুঁজে পেলাম।\nথামলাম। সুযোগ-সুবিধা পুরনো, কিন্তু জল চমৎকার।\nগরম জলের উৎস তার জল দিয়েই বিচার করতে হয়... তাই না?`],
+    7:[`বছরের শেষের কেনাকাটার দিন — বার্ষিক বড় অনুষ্ঠান।\nরাস্তা ঠাসা, দোকান ঠাসা, সব কিছু গিজগিজ করছে।\n14°C, এই সময়ের জন্য উষ্ণ। শুধু এটাই ছিল স্বস্তি।`],
+    8:[`৮ মার্চ\nতোহোকুর পথে\nঠান্ডা ছিল না`,`১০ মার্চ\nসকাল সকাল মিতসুমিনে পর্বতে গেলাম — যেমনটা দেখতে পাচ্ছেন`,`পাহাড়েও বরফ ছিল`,`মার্চ সেই মাস যেখানে শীত ও বসন্ত যুদ্ধ করে`],
+    9:[`এ বছর প্রথমবার 20°C-এর উপরে — 22°C।`],
+  },
+  ru: {
+    0:[`Запах листьев? Зелени? Земли? Этот свежий, травянистый запах?\nКаждый год ищу нужные слова и каждый год не нахожу.\nНо каждый год, неизменно, замечаю его.\nВот снова приходит жара. В этом году тоже.\nЖара, будь со мной помягче.\nЯ правда не хочу с тобой ссориться.`],
+    1:[`Ночью запах воздуха снаружи стал зимним. Неужели начинается?\nЧто такое запах зимнего воздуха? До сих пор не могу объяснить.\nКак будто зелёный сырой запах лета вдруг исчез. Как будто сам воздух вдруг высох.\nПо-прежнему так же беспомощен со словами.`],
+    2:[`Совсем недавно я написал «кажется, весна уже близко».\nИ вот сегодня — снег. Больше пяти сантиметров.\nСлишком далеко в зиму. Снег, иди падай на горнолыжные курорты.\nНа равнине Канто в это время ты не к месту.`],
+    3:[`Позавчера почувствовал, что дни, возможно, стали короче.\nА мы ещё в разгаре летней жары.\nТело знает времена года честнее любого календаря.`],
+    4:[`На улице было по-настоящему холодно.\nГуляя по городу, я заметил: все уже перешли на тёплые пальто.\nКаждый год, когда приходит этот сезон, думаю одно и то же — радостно и грустно.`],
+    5:[`Сегодня ночью впервые поиграл в игры на ПК.\nКонсоль есть, но старая —\nдумал, что она ничего не запустит.\nПотом проверил характеристики —\nеле-еле, но тянет! Серьёзно? Попробуем.\nРаботает удивительно хорошо. Поражён.\nНовое открытие — но в основе своей, игры — это для специализированных консолей.`],
+    6:[`Взгляните на температуру снаружи на панели приборов арендованного авто\nГде же мы???`,`Зона обслуживания Сугао — единственная вывеска, которую удалось здесь сфотографировать...`,`Лесная дорога рядом с домом родителей`,`Листья уже желтеют — а ведь ещё август`,`Нашёл горячий источник с очень многообещающим названием.\nОстановился. Удобства старые, но вода превосходная.\nГорячий источник судят по воде... ведь правда?`],
+    7:[`День предновогодних покупок — ежегодное важное мероприятие.\nДороги забиты, магазины забиты, давка.\n14°C, тепло для этого времени года. Только это и спасало.`],
+    8:[`8 марта\nПо дороге в Тохоку\nХолода не было`,`10 марта\nПоехал на гору Мицумине с самого утра — как видите`,`На горе тоже был снег`,`Март — это месяц, когда зима и весна воюют`],
+    9:[`Впервые в этом году выше 20°C — 22°C.`],
+  },
+  id: {
+    0:[`Aroma daun? Aroma hijau? Aroma tanah? Bau segar dan lembap itu?\nSetiap tahun kucari kata yang tepat tapi tidak pernah kutemukan.\nTapi setiap tahun, pasti, aku menyadarinya.\nTibalah lagi panas. Tahun ini juga.\nPanas, tolong jangan keras padaku.\nAku benar-benar tidak mau bertengkar denganmu.`],
+    1:[`Malam itu bau udara di luar berubah menjadi musim dingin. Apakah ini awalnya?\nApa sebenarnya bau udara musim dingin? Sampai sekarang aku tidak bisa menjelaskannya.\nSeperti bau hijau mentah musim panas yang tiba-tiba hilang. Seperti udara itu sendiri yang tiba-tiba kering.\nTetap sama bungkamnya dengan kata-kata seperti biasa.`],
+    2:[`Tidak lama ini aku baru menulis "sepertinya musim semi akan datang".\nDan hari ini — salju. Lebih dari lima sentimeter.\nTerlalu jauh kembali ke musim dingin. Salju, pergilah turun di resor ski.\nKamu tidak pantas berada di dataran Kanto pada waktu ini.`],
+    3:[`Sejak kemarin-kemarin, aku merasa hari mungkin sudah mulai memendek.\nPadahal kita masih di tengah-tengah terik panas midsummer.\nTubuh mengenal musim lebih jujur daripada kalender manapun.`],
+    4:[`Benar-benar dingin di luar.\nBerjalan di kota, semua orang sudah berganti ke jaket tebal tanpa kusadari.\nSetiap tahun saat musim ini tiba, aku memikirkan hal yang sama — senang dan sedih.`],
+    5:[`Malam ini untuk pertama kali main game di PC.\nPunya konsol, tapi sudah tua —\nkira-kira tidak akan bisa memainkan apapun.\nLalu kucek spesifikasinya —\npas-pasan bisa! Serius? Ayo coba.\nTernyata jalan dengan baik. Kaget.\nTemuan baru — tapi pada dasarnya, game ya tempatnya di konsol khusus.`],
+    6:[`Lihat suhu luar pada dasbor mobil sewaan\nKita ada di mana ini???`,`Rest Area Sugao — Ini satu-satunya papan yang bisa difoto di sini...`,`Jalan hutan di dekat rumah orang tua`,`Daun musim gugur sudah muncul, padahal masih Agustus`,`Kutemukan sumber air panas dengan nama yang sangat menggembirakan.\nAku berhenti. Fasilitasnya tua, tapi airnya luar biasa.\nSumber air panas dinilai dari airnya... betul kan?`],
+    7:[`Hari belanja akhir tahun — acara tahunan besar.\nJalan-jalan macet, toko-toko penuh sesak, seperti ikan dalam kaleng.\n14°C, hangat untuk musim ini. Hanya itu yang menyelamatkan.`],
+    8:[`8 Maret\nDalam perjalanan ke Tohoku\nTidak dingin`,`10 Maret\nPergi ke Gunung Mitsumine sejak pagi-pagi — seperti yang bisa kalian lihat`,`Di gunung pun masih ada salju`,`Maret adalah bulan di mana musim dingin dan musim semi berperang`],
+    9:[`Pertama kali di atas 20°C tahun ini — 22°C.`],
+  },
+  de: {
+    0:[`Blätterduft? Grüngeruch? Erdgeruch? Dieser frische, grasige Duft?\nJedes Jahr suche ich die richtigen Worte und jedes Jahr finde ich sie nicht.\nAber jedes Jahr, ohne Ausnahme, bemerke ich es.\nDa kommt sie wieder, die Hitze. Auch dieses Jahr.\nHitze, geh bitte sanft mit mir um.\nIch will wirklich keinen Streit mit dir.`],
+    1:[`Nachts hat sich der Geruch der Außenluft in Winterluft verwandelt. Ist das der Anfang?\nWas riecht Winterluft überhaupt? Ich kann es noch immer nicht erklären.\nAls wäre der grüne, rohe Duft des Sommers plötzlich verschwunden. Als wäre die Luft selbst plötzlich getrocknet.\nNach wie vor so sprachlos wie immer.`],
+    2:[`Ich hatte erst kürzlich geschrieben "der Frühling ist bald da".\nUnd heute ausgerechnet — Schnee. Mehr als fünf Zentimeter.\nViel zu weit zurück in den Winter. Schnee, geh auf die Skipisten fallen.\nAuf der Kanto-Ebene hast du zu dieser Zeit nichts verloren.`],
+    3:[`Seit vorgestern habe ich das Gefühl, dass die Tage kürzer werden.\nDabei stecken wir noch mitten im Hochsommer.\nDer Körper kennt die Jahreszeiten ehrlicher als jeder Kalender.`],
+    4:[`Draußen war es wirklich kalt.\nIn der Stadt spazierend bemerkte ich: Alle trugen auf einmal dicke Jacken.\nJedes Jahr, wenn diese Jahreszeit kommt, denke ich dasselbe — froh und traurig.`],
+    5:[`Heute Nacht zum ersten Mal auf dem PC gespielt.\nHabe eine Konsole, aber sie ist alt —\nich dachte, sie würde nichts mehr abspielen.\nDann habe ich die Spezifikationen geprüft —\ndie reichen gerade so! Wirklich? Lass es uns versuchen.\nLäuft überraschend gut. Beeindruckt.\nNeue Entdeckung — aber im Grunde gehören Spiele auf dedizierte Konsolen.`],
+    6:[`Schau mal auf die Außentemperatur im Display des Mietwagens\nWo sind wir bloß???`,`Rastplatz Sugao — Das war das einzige Schild hier, von dem ich ein Foto machen konnte...`,`Ein Waldweg nahe dem Haus meiner Eltern`,`Herbstlaub bereits im August`,`Ich fand ein heißes Quellbad mit einem sehr verheißungsvollen Namen.\nMachte halt. Die Einrichtungen sind alt, aber das Wasser ist ausgezeichnet.\nEin heißes Quellbad wird nach seinem Wasser beurteilt... stimmt's?`],
+    7:[`Einkaufstag zum Jahresende — eine jährliche Großveranstaltung.\nDie Straßen voll, die Läden voll, alles gedrängt voll.\n14°C, warm für die Jahreszeit. Das allein war eine Gnade.`],
+    8:[`8. März\nAuf dem Weg nach Tōhoku\nEs war nicht kalt`,`10. März\nFrühmorgens zum Berg Mitsumine gefahren — wie Sie sehen können`,`Auf dem Berg lag auch noch Schnee`,`März ist der Monat, in dem Winter und Frühling Krieg führen`],
+    9:[`Zum ersten Mal dieses Jahr über 20°C — 22°C.`],
+  },
+  pl: {
+    0:[`Zapach liści? Zieleni? Ziemi? Ten świeży, trawiasty zapach?\nKażdego roku szukam właściwych słów i każdego roku nie mogę ich znaleźć.\nAle każdego roku, bez wyjątku, zauważam to.\nI znów przyszedł upał. Tego roku też.\nUpale, obchodź się ze mną łagodnie.\nNaprawdę nie chcę się z tobą kłócić.`],
+    1:[`W nocy zapach powietrza na zewnątrz zmienił się w zimowy. Czy to już początek?\nCzym właściwie pachnie zimowe powietrze? Nadal nie potrafię tego wytłumaczyć.\nJakby zielony, surowy zapach lata nagle zniknął. Jakby samo powietrze nagle wyschło.\nNadal tak samo bezradny z językiem jak zawsze.`],
+    2:[`Niedawno napisałem "chyba wiosna jest już blisko".\nI właśnie dzisiaj — śnieg. Ponad pięć centymetrów.\nZa daleko z powrotem w zimę. Śniegu, idź padać na stoki narciarskie.\nNa równinie Kanto o tej porze roku nie pasujesz.`],
+    3:[`Od przedwczoraj mam wrażenie, że dni mogły zacząć się skracać.\nA jesteśmy w samym środku letnich upałów.\nCiało zna pory roku uczciwie niż jakikolwiek kalendarz.`],
+    4:[`Na dworze było naprawdę zimno.\nIdąc przez miasto, wszyscy mieli już na sobie grube kurtki.\nKażdego roku, gdy nadchodzi ta pora, myślę to samo — radość i smutek.`],
+    5:[`Dziś w nocy po raz pierwszy grałem na PC.\nMam konsolę, ale jest stara —\nzakładałem, że nic nie uruchomi.\nPotem sprawdziłem specyfikacje —\no mały włos, ale daje radę! Serio? Spróbujmy.\nDziała zaskakująco dobrze. Zaskoczony.\nNowe odkrycie — ale w zasadzie, gry należą do dedykowanych konsol.`],
+    6:[`Spójrz na temperaturę zewnętrzną na desce rozdzielczej wynajętego samochodu\nGdzie w ogóle jesteśmy???`,`Stacja obsługi Sugao — To była jedyna tablica, którą udało mi się tu sfotografować...`,`Leśna droga w pobliżu domu rodziców`,`Jesienne liście już w sierpniu`,`Znalazłem gorące źródło o bardzo pomyślnej nazwie.\nZatrzymałem się. Obiekt stary, ale woda znakomita.\nGorące źródło ocenia się według wody... prawda?`],
+    7:[`Dzień przedświątecznych zakupów — doroczna wielka impreza.\nDrogi zakorkowane, sklepy zakorkowane, ścisk nie do opisania.\n14°C, ciepło jak na tę porę roku. To jedyne co ratowało.`],
+    8:[`8 marca\nW drodze do Tōhoku\nNie było zimno`,`10 marca\nRano wyruszyłem na górę Mitsumine — jak możecie zobaczyć`,`Na górze też leżał śnieg`,`Marzec to miesiąc, w którym zima i wiosna toczą wojnę`],
+    9:[`Po raz pierwszy w tym roku powyżej 20°C — 22°C.`],
+  },
+  ko: {
+    0:[`잎의 냄새? 초록의 냄새? 흙의 냄새? 풋내?\n매년 딱 맞는 표현이 떠오르지 않아 답답하지만\n매년 반드시 알아차린다\n이제 더워질 건가 하고. 올해도 잘 부탁드려.\n더위여, 살살 와줘.\n너와 싸우고 싶지 않아.`],
+    1:[`밤에 바깥 공기 냄새가 겨울로 바뀌었다. 겨울의 시작일까?\n겨울 공기 냄새가 뭐냐는 얘기인데, 이것도 역시\n잘 설명이 안 된다.\n여름의 풋내가 갑자기 사라진 것 같은, 공기 자체가 갑자기 건조해진 것 같은——\n여전히 어휘력 부족에 스스로 기가 막힌다.`],
+    2:[`얼마 전에 "이제 봄이 오려나"라고 썼을 뿐인데\n오늘은 웬걸, 눈이 5cm 이상 쌓였다.\n겨울로 너무 돌아갔다. 눈아, 스키장에 가서 내려라.\n관동 평야에 이 시기에 너는 어울리지 않는다.`],
+    3:[`엊그제부터 해가 짧아진 것 같다는 느낌이 들었다.\n그런데 아직 한여름의 더위 한가운데다.\n몸의 감각은 달력보다 더 솔직하게 계절을 안다.`],
+    4:[`바깥은 진짜 추웠다.\n거리를 걷다 보니 어느새 다들 두꺼운 옷으로 바꿔 입어 있었다.\n매년 이 계절이 올 때마다 생각한다 — 기쁘고, 쓸쓸하다.`],
+    5:[`밤에 처음으로 PC로 게임을 했다.\n게임기는 가지고 있는데\n오래됐으니 돌아갈 리 없겠지 하고\n제멋대로 단정지었는데 잘 찾아보니\n스펙이 간신히 된다! 진짜? 그럼 깔아보자.\n의외로 잘 돌아간다. 놀랍다.\n새로운 발견을 했지만, 기본적으로\n게임은 전용 하드웨어에서 한다.`],
+    6:[`렌터카 계기판의 외기온도를 주목\n여기가 어디야???`,`스가오 서비스에어리어 — 여기서 사진 찍을 수 있는 간판이 이것밖에 없었어...`,`부모님 집 근처의 임도`,`8월인데 벌써 단풍이`,`좋은 이름의 온천을 발견해\n들렀다. 시설은 오래됐지만 물은 좋다.\n온천은 물로 판단하는 것...맞지?`],
+    7:[`연말 장보기 날 — 이것도 대행사다.\n도로는 막히고, 가게는 북적이고, 아수라장.\n14℃, 낮에는 따뜻했다. 그게 그나마 구원이었다.`],
+    8:[`3월 8일\n도호쿠로 향하는 길\n춥지 않았다`,`3월 10일\n아침 일찍부터 미쓰미네산에 갔더니 보시다시피`,`산에도 눈이 남아 있었다`,`3월은 겨울과 봄이 싸우는 달이다`],
+    9:[`올해 처음 20℃ 초과 — 22℃.`],
+  },
+  zh: {
+    0:[`树叶的气味？绿色的气味？泥土的气味？那股新鲜的植物气息？\n每年都找不到合适的表达，每年都为此懊恼\n但每年一定会注意到\n今年也来热了。今年也麻烦了。\n酷暑啊，对我好一点。\n我真的不想跟你对着干。`],
+    1:[`夜晚，室外空气的味道变成了冬天。这是冬天的开始吗？\n冬天的空气是什么味道？这个也说不清楚。\n就像夏天的青涩气息突然消失了，空气本身突然变得干燥了——\n依然为自己词穷而哑然。`],
+    2:[`不久前才刚写了"春天快来了"\n今天却下了超过5厘米的雪。\n冬天回来得太彻底了。雪啊，去滑雪场下吧。\n关东平原这个时节不需要你。`],
+    3:[`前天开始感觉白昼可能变短了。\n但还在盛夏的炎热之中。\n身体感知比日历更诚实地了解季节。`],
+    4:[`外面真的很冷。\n走在街上，不知什么时候大家都换上了厚重的衣服。\n每年这个季节来临时都会想——高兴，寂寞。`],
+    5:[`今晚第一次用电脑玩了游戏。\n我有游戏机，但很旧——\n理所当然地以为跑不起来。\n仔细查了一下配置——\n勉强够用！是真的吗？那就装来试试。\n出乎意料地运行很流畅。惊讶。\n虽然有了新发现，但基本上\n游戏还是用专用主机来玩。`],
+    6:[`看看租车仪表盘上显示的外气温\n这到底是哪儿???`,`菅生服务区 — 这里唯一能拍照的牌子就只有这个...`,`父母家附近的林道`,`明明才八月，红叶已经开始了`,`发现了一个名字很吉利的温泉。\n顺道去了。设施虽旧，但泉水很好。\n温泉就应该以泉水来评判……对吧？`],
+    7:[`年末大采购日——这也是年度大事。\n路上堵，店里挤，人山人海。\n14℃，白天很暖和。这是唯一的安慰。`],
+    8:[`3月8日\n前往东北的途中\n不太冷`,`3月10日\n一早就去了三峰山 — 如您所见`,`山上也留着雪`,`3月是冬天和春天交战的月份`],
+    9:[`今年首次超过20°C — 22°C。`],
+  },
+  yue: {
+    0:[`樹葉嘅氣味？綠色嘅氣味？泥土嘅氣味？嗰股新鮮嘅植物氣息？\n每年都搵唔到合適嘅表達，每年都為此苦惱\n但係每年一定會留意到\n今年又要熱喇。今年又煩喇。\n酷暑啊，對我好啲。\n我真係唔想同你對著幹。`],
+    1:[`夜晚，室外空氣嘅味道變成咗冬天。係冬天嘅開始咩？\n冬天嘅空氣係咩味道？呢個都係說唔清楚嘅。\n就好似夏天嘅青澀氣息突然消失咗，空氣本身突然變乾咗——\n依然為自己詞窮而無言。`],
+    2:[`唔係好耐之前剛寫咗「春天快嚟喇」\n今日卻落咗超過5厘米嘅雪。\n冬天返得太徹底喇。雪啊，去滑雪場落喇。\n關東平原呢個時候唔需要你。`],
+    3:[`前日開始感覺白晝可能變短咗。\n但係仲喺盛夏嘅炎熱之中。\n身體感知比日曆更誠實地了解季節。`],
+    4:[`外面真係好凍。\n行喺街上，唔知幾時大家都換上咗厚重嘅衣服。\n每年呢個季節嚟臨時都會諗——開心，寂寞。`],
+    5:[`今晚第一次用電腦玩咗遊戲。\n我有遊戲機，但係好舊——\n理所當然噉以為跑唔起。\n仔細查咗一下配置——\n勉強夠用！係真嘅咩？噉就裝嚟試下。\n出乎意料噉運行好流暢。驚訝。\n雖然有咗新發現，但基本上\n遊戲仲係用專用主機嚟玩。`],
+    6:[`留意租借車嘅儀表板外氣溫度\n呢度係邊度???`,`菅生服務區——呢度唯一可以影相嘅招牌得呢個...`,`爸媽屋企附近嘅林道`,`八月就已經開始紅葉喇`,`發現咗一個名字好意頭嘅溫泉。\n順道去咗。設施雖然舊，但泉水好好。\n溫泉就應該以泉水嚟評判……係咩？`],
+    7:[`年末大採購日——呢個都係年度大事。\n路上塞車，店裏擠滿人，人山人海。\n14°C，白天好暖。呢個係唯一嘅安慰。`],
+    8:[`3月8日\n去東北嘅途中\n唔係好凍`,`3月10日\n一早就去咗三峰山 — 如你所見`,`山上都仲有雪`,`3月係冬天同春天交戰嘅月份`],
+    9:[`今年首次超過20°C — 22°C。`],
+  },
+};
+
+/* ── Article Modal ── */
+(function(){
+  const articles = [
+    {
+      tag:'体感記', date:'2025.05.21', title:'空気の匂いが、夏に変わった',
+      body:`葉っぱの匂い？緑の臭い？土の匂い？青くさい？
+上手い表現が見つからなくて毎年もどかしいが
+毎年必ず気づく事
+これから暑くなるのか、と  今年もよろしく
+暑さよ、お手柔らかに頼む
+お前とは喧嘩したく無いんだよ`
+    },
+    {
+      tag:'体感記', date:'2025.11.12', title:'夜の空気が、冬の匂いに変わった',
+      body:`夜　外の空気の匂いが冬に変わった　冬の始まりか？
+冬の空気の匂いって何だ？って話だが  これもまた
+うまく説明できないんだな これが
+夏の青臭さが急に抜けた様な 空気そのものが急に乾いた様な
+相変わらず語彙力の無さに我ながら脱力`
+    },
+    {
+      tag:'体感記', date:'2025.03.19', title:'3月に、雪が積もった',
+      body:`少し前に「そろそろ春かな」と書いたばかりだが
+今日はなんと雪  しかも積雪５センチ以上
+冬に戻りすぎ  雪よ、スキー場に降ってあげなさい
+関東平野にこの時期お前は似合わない`
+    },
+    {
+      tag:'体感記', date:'2025.08.16', title:'日が短くなった',
+      body:`8月16日
+一昨日あたりから、日が短くなったかもしれない、と気づいた
+まだ真夏の暑さの真っ只中だというのに
+体感は、カレンダーよりも正直に季節を知っている`
+    },
+    {
+      tag:'体感記', date:'2025.10.29', title:'街が、冬の支度をしていた',
+      body:`10月29日
+外がガチで寒かった
+街を歩くと、みんないつの間にか厚手の服に変わっていた
+毎年この季節が来るたびに思う——嬉しく、寂しい`
+    },
+    {
+      tag:'体感記', date:'2025.08.10', title:'PCでゲームをやったら、動いた',
+      body:`夜初めてPCでゲームをやった
+ゲーム機は持っているのだが
+古いので動くわけないだろと
+勝手に決めつけていたがよくよく調べると
+スペックギリ行ける！まじか じゃあ入れてみるわ
+意外としっかり動く　驚き
+新たな発見をしたが基本
+ゲームは専用ハードでやる`
+    },
+    {
+      tag:'体感記', date:'2025.08.24', title:'関東から東北へ',
+      body:[
+        {img:'images/20250824_01.jpg'},
+        `レンタカーのメーター内の外気温に注目
+ここはどこ？？？`,
+        {img:'images/20250824_02.jpg'},
+        `菅生サービスエリア ここは写真を撮れる看板がここしか無かった・・・`,
+        {img:'images/20250825_01.jpg'},
+        `実家近くの林道`,
+        {img:'images/20250825_02.jpg'},
+        `８月なのに早くも紅葉が`,
+        {img:'images/20250826.jpg'},
+        `ありがたい名前の温泉を見つけたので
+立ち寄る 設備は古いがお湯は良し
+温泉とはお湯で判断するもの・・・だよね？`,
+      ]
+    },
+    {
+      tag:'体感記', date:'2025.12.29', title:'年末の買い出し、イモ洗い状態',
+      body:[
+        `年末の買い出し日——これも一大行事
+道は混むわ、店は混むわ、イモ洗い状態
+気温14℃、昼間は暖かかった。それだけが救いだった`,
+        {img:'images/20251229_01.jpg'},
+      ]
+    },
+    {
+      tag:'体感記', date:'2026.03.10', title:'東北往復から三峰山',
+      body:[
+        `3月8日
+東北へ向かう道中
+寒くはなかった`,
+        {img:'images/20260308_01.jpg'},
+        `3月10日
+三峰山に朝一から行ったが、御覧の通り`,
+        {img:'images/20260309_01.jpg'},
+        `山にも雪が残っていた`,
+        {img:'images/20260309_02.jpg'},
+        `3月は、冬と春が戦っている月だ`,
+      ]
+    },
+    {
+      tag:'体感記', date:'2026.03.29', title:'初の20℃超え、花見日和',
+      body:[
+        `初の20℃超え　22℃`,
+        {img:'images/20260329_01.jpg'},
+        {img:'images/20260329_02.jpg'},
+        {img:'images/20260329_03.jpg'},
+      ]
+    },
+    {
+      tag:'体感記', date:'2026.04.22', title:'つつじ園',
+      body:[
+        {img:'images/20260422_01.jpg'},
+        {img:'images/20260422_02.jpg'},
+        {img:'images/20260422_03.jpg'},
+      ]
+    },
+  ];
+
+  const modal   = document.getElementById('article-modal');
+  const modalBg = document.getElementById('modal-bg');
+  const btnClose= document.getElementById('modal-close');
+  const elTag   = document.getElementById('modal-tag');
+  const elDate  = document.getElementById('modal-date');
+  const elTitle = document.getElementById('modal-title');
+  const elBody  = document.getElementById('modal-body');
+
+  function renderBody(body) {
+    elBody.innerHTML = '';
+    const blocks = Array.isArray(body) ? body : [body];
+    blocks.forEach(block => {
+      if (typeof block === 'string') {
+        const d = document.createElement('div');
+        d.className = 'article-modal-body';
+        d.textContent = block;
+        elBody.appendChild(d);
+      } else if (block.img) {
+        const img = document.createElement('img');
+        img.src = block.img;
+        img.className = 'article-modal-img';
+        img.alt = block.alt || '';
+        elBody.appendChild(img);
+      }
+    });
+  }
+
+  let currentArticleIdx = -1;
+
+  function getLocalizedBody(idx, lang) {
+    const a = articles[idx];
+    const blocks = articleTextBlocks[lang] && articleTextBlocks[lang][idx];
+    if (!blocks) return a.body;
+    if (!Array.isArray(a.body)) return blocks[0] || a.body;
+    let ti = 0;
+    return a.body.map(b => typeof b === 'string' ? (blocks[ti++] || b) : b);
+  }
+
+  function renderModal(idx, lang) {
+    const a = articles[idx];
+    if (!a) return;
+    const meta = articleMeta[lang];
+    elTag.textContent   = (meta && meta.tag)              || a.tag;
+    elDate.textContent  = a.date;
+    elTitle.textContent = (meta && meta.titles && meta.titles[idx]) || a.title;
+    renderBody(getLocalizedBody(idx, lang));
+  }
+
+  function openModal(idx) {
+    const a = articles[idx];
+    if (!a) return;
+    currentArticleIdx = idx;
+    renderModal(idx, currentLang);
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('langchange', e => {
+    if (modal.classList.contains('open') && currentArticleIdx >= 0) {
+      renderModal(currentArticleIdx, e.detail);
+    }
+  });
+
+  document.querySelectorAll('.post-card').forEach((card, i) => {
+    card.addEventListener('click', () => openModal(i));
+  });
+
+  btnClose.addEventListener('click', closeModal);
+  modalBg.addEventListener('click', closeModal);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+})();
+
+/* Re-apply language after articleMeta is defined */
+setLanguage(currentLang);
+</script>
+</body>
+</html>
