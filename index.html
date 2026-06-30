@@ -240,6 +240,10 @@
       .ornament { margin: 28px 0; }
       footer { padding: 36px 0; }
       .lang-btn { padding: 6px 9px; font-size: 0.6rem; }
+      .article-modal-box { padding: 44px 20px 32px; max-height: 90vh; }
+      .article-modal-title { font-size: 18px; margin-bottom: 20px; padding-bottom: 16px; }
+      .article-modal-body { font-size: 15px; line-height: 2.2; }
+      .article-modal-img { max-height: 260px; margin: 20px 0; }
     }
     @media (max-width: 380px) {
       .hero-title { font-size: 1.7rem; }
@@ -1791,18 +1795,25 @@ const articleTextBlocks = {
     renderBody(getLocalizedBody(idx, lang));
   }
 
+  let _scrollY = 0;
   function openModal(idx) {
     const a = articles[idx];
     if (!a) return;
     currentArticleIdx = idx;
     renderModal(idx, currentLang);
     modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    _scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${_scrollY}px`;
+    document.body.style.width = '100%';
   }
 
   function closeModal() {
     modal.classList.remove('open');
-    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    window.scrollTo(0, _scrollY);
   }
 
   document.addEventListener('langchange', e => {
@@ -1812,7 +1823,7 @@ const articleTextBlocks = {
   });
 
   document.querySelectorAll('.post-card').forEach((card, i) => {
-    card.addEventListener('click', () => openModal(i));
+    card.addEventListener('click', (e) => { e.preventDefault(); openModal(i); });
   });
 
   btnClose.addEventListener('click', closeModal);
