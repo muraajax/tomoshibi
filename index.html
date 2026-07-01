@@ -30,7 +30,7 @@
       overflow-x: hidden;
     }
     #ember-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; }
-    .page-bg { position: fixed; inset: 0; z-index: 1; background-image: linear-gradient(rgba(5,4,3,0.58),rgba(5,4,3,0.58)), url('images/Tomo.png'); background-size: cover; background-position: center; pointer-events: none; }
+    .page-bg { position: fixed; inset: 0; z-index: 1; background-image: linear-gradient(rgba(5,4,3,0.58),rgba(5,4,3,0.58)), url('images/Tomosibi.png'); background-size: cover; background-position: center; pointer-events: none; }
     body::before {
       content: '';
       position: fixed; inset: 0;
@@ -1836,9 +1836,14 @@ const articleTextBlocks = {
 
 /* Re-apply language after articleMeta is defined */
 setLanguage(currentLang);
+
+/* Scroll to top on load (iOS Safari scroll restoration対策) */
+if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+window.addEventListener('load', () => { window.scrollTo(0, 0); });
 </script>
 </body>
 </html>
+
 
 
 
