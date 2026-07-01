@@ -143,6 +143,9 @@
 
     /* ── Footer ── */
     footer { border-top: 1px solid var(--border); padding: 48px 0; text-align: center; }
+    .back-to-top { position: fixed; bottom: 32px; right: 28px; z-index: 200; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.35); background: rgba(5,4,3,0.75); color: #fff; font-size: 17px; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, border-color 0.3s, color 0.3s; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .back-to-top.visible { opacity: 1; pointer-events: auto; }
+    .back-to-top:hover { border-color: var(--gold); color: var(--gold); }
     .footer-logo { font-family: 'Cinzel', serif; font-weight: 900; font-size: 22px; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 20px; }
     .footer-logo-span { color: var(--ember); }
     .footer-copy { font-size: 16px; color: var(--ivory); letter-spacing: 0.2em; font-family: 'Cinzel', serif; text-transform: uppercase; }
@@ -244,6 +247,7 @@
       .article-modal-title { font-size: 18px; margin-bottom: 20px; padding-bottom: 16px; }
       .article-modal-body { font-size: 15px; line-height: 2.2; }
       .article-modal-img { max-height: 260px; margin: 20px 0; }
+      .back-to-top { bottom: 40px; right: 16px; width: 40px; height: 40px; font-size: 15px; }
       .page-bg { background-image: linear-gradient(rgba(5,4,3,0.58),rgba(5,4,3,0.58)), url('images/スマホ/0.png') !important; }
       .tomo-viewport .tomo-bg:nth-child(1) { background-image: url('images/スマホ/1.png') !important; }
       .tomo-viewport .tomo-bg:nth-child(2) { background-image: url('images/スマホ/2.png') !important; }
@@ -487,6 +491,8 @@
 </section>
 
 <div class="site-wrapper">
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">▲</button>
+
   <footer>
     <p class="footer-logo">Bring light into<span class="footer-logo-span">&nbsp;the darkness</span></p>
     <div class="ornament" style="margin:16px 0">✦</div>
@@ -1846,6 +1852,13 @@ setLanguage(currentLang);
 /* Scroll to top on load (iOS Safari scroll restoration対策) */
 if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
 window.addEventListener('load', () => { window.scrollTo(0, 0); });
+
+/* Back to top button */
+const backToTopBtn = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backToTopBtn.classList.toggle('visible', window.scrollY > 300);
+}, { passive: true });
+backToTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 </script>
 </body>
 </html>
