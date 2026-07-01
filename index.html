@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja" dir="ltr" data-lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -104,8 +104,8 @@
     .hero-title { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(2rem, 7vw, 4rem); color: var(--ivory); letter-spacing: 0.05em; line-height: 1.2; text-shadow: 0 0 60px rgba(200,169,110,0.2); margin-bottom: 12px; }
     .hero-title em { font-style: normal; color: var(--gold); }
     .hero-jp { font-size: clamp(0.9rem, 2.5vw, 1.4rem); color: var(--muted); font-weight: 300; letter-spacing: 0.15em; margin-bottom: 36px; }
-    .hero-desc { max-width: 520px; font-size: 16px; color: var(--muted); line-height: 2; margin-bottom: 48px; }
-    .hero-cta { display: inline-block; border: 1px solid #fff; color: #fff; font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; padding: 16px 40px; transition: all 0.4s; position: relative; overflow: hidden; }
+    .hero-desc { max-width: 520px; font-size: 20px; color: var(--muted); line-height: 2; margin-bottom: 48px; }
+    .hero-cta { display: inline-block; border: 1px solid #fff; color: #fff; font-family: 'Cinzel', serif; font-size: 20px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; padding: 16px 40px; transition: all 0.4s; position: relative; overflow: hidden; }
     .hero-cta::before { content: ''; position: absolute; inset: 0; background: #fff; transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; z-index: -1; }
     .hero-cta:hover { color: var(--black); }
     .hero-cta:hover::before { transform: scaleX(1); }
@@ -314,7 +314,7 @@
 
     <h1 class="hero-title" data-i18n-html="hero-title">闇の中に<br /><em>光を灯す</em></h1>
     <p class="hero-jp" data-i18n="hero-jp">日々の思索の刻印</p>
-    <p class="hero-desc" data-i18n="hero-desc">これは私が刻む、旅の手記、思索の断片——</p>
+    <p class="hero-desc" data-i18n="hero-desc">ここは旅の刻印等の　我が魂の断片が　静かに眠る場所</p>
     <a href="#posts" class="hero-cta" data-i18n="hero-cta">刻印を辿る</a>
 
   </section>
@@ -461,20 +461,20 @@
     <div class="tomo-bg" style="background-image:url('images/Tomosibi.png')"></div>
     <div class="tomo-overlay"></div>
     <div class="tomo-content">
-      <p class="tomo-lead" data-i18n="tomo-lead-1">此処の手記の刻印者、灯火（ともしび）と申します</p>
+      <p class="tomo-lead" data-i18n="tomo-lead-1">此処の刻印者、灯火（ともしび）と申します</p>
       <p class="tomo-body" data-i18n="tomo-body-1">この暗闇の先で、何かを探しているのなら——</p>
     </div>
     <div class="tomo-content">
       <p class="tomo-lead" data-i18n="tomo-lead-2">暗闇を、ずっと恐れていた</p>
-      <p class="tomo-body" data-i18n-html="tomo-body-2">夜が怖かった。光が消えると、世界が違う顔を見せる気がして<br>だが今は知っている　暗闇の中にしか　見えないものがある　と</p>
+      <p class="tomo-body" data-i18n-html="tomo-body-2">夜が怖かった<br>光が消えると<br>暗闇に飲み込まれる気がして<br>だが今は知っている　暗闇の中にしか　輝かない何かがある　と</p>
     </div>
     <div class="tomo-content">
       <p class="tomo-lead" data-i18n="tomo-lead-3">星は、夜空にしか輝かない</p>
-      <p class="tomo-body" data-i18n-html="tomo-body-3">この手記は私の痕跡だ。旅のこと、本のこと、ふとした夜中の思考のかけら<br>美しいと感じた瞬間を、言葉で捕まえようとする試み</p>
+      <p class="tomo-body" data-i18n-html="tomo-body-3">この刻印は魂の痕跡だ　旅　書籍　ふとした思考の断片<br>魂が何かを感じた瞬間を　此処に眠らせようとする試み</p>
     </div>
     <div class="tomo-content">
       <p class="tomo-lead" data-i18n="tomo-lead-4">完璧には程遠い。でも、だからこそ本物だと思っている</p>
-      <p class="tomo-body" data-i18n-html="tomo-body-4">暗闇の中で灯す火は、小さくていい<br>それでも、誰かの目に届くならば</p>
+      <p class="tomo-body" data-i18n-html="tomo-body-4">暗闇の中で灯す火は<br>小さくていい<br>それでも<br>誰かの目に届くならば</p>
     </div>
     <div class="tomo-content"></div>
   </div>
@@ -496,7 +496,7 @@ const t = {
     'hero-subtitle':'— Personal Chronicle —',
     'hero-title':'闇の中に<br /><em>光を灯す</em>',
     'hero-jp':'日々の思索の刻印',
-    'hero-desc':'これは私が刻む、旅の手記、思索の断片——',
+    'hero-desc':'ここは旅の刻印等の　我が魂の断片が　静かに眠る場所',
     'hero-cta':'刻印を辿る','scroll':'Scroll',
     'posts-label':'— Chronicle —','posts-title':'最新の刻印録',
     'tag-1':'刻印','title-1':'空気の匂いが、夏に変わった',
@@ -523,14 +523,14 @@ const t = {
     'excerpt-11':'4月22日。つつじ園へ。',
     'read-more':'刻印を辿る →',
     'tomoshibi-label':'— 灯火 —','tomoshibi-body':'暗闇を、ずっと恐れていた。<br /><br />子供の頃、夜が怖かった。光が消えると、世界が違う顔を見せる気がして。<br />だが今は知っている　暗闇の中にしか　見えないものがある　と。<br /><br />星は、夜空にしか輝かない。<br /><br />この手記は私の痕跡だ。旅のこと、本のこと、ふとした夜中の思考のかけら。<br />美しいと感じた瞬間を、言葉で捕まえようとする試み。<br /><br />完璧には程遠い。でも、だからこそ本物だと思っている。<br /><br />暗闇の中で灯す火は、小さくていい。<br />それでも、誰かの目に届くならば。',
-    'tomo-lead-1':'此処の手記の刻印者、灯火（ともしび）と申します',
+    'tomo-lead-1':'此処の刻印者、灯火（ともしび）と申します',
     'tomo-body-1':'この暗闇の中で　何かを探しているなら——',
     'tomo-lead-2':'暗闇を、ずっと恐れていた',
-    'tomo-body-2':'夜が怖かった。光が消えると、世界が違う顔を見せる気がして<br>だが今は知っている　暗闇の中にしか　見えないものがある　と',
+    'tomo-body-2':'夜が怖かった<br>光が消えると<br>暗闇に飲み込まれる気がして<br>だが今は知っている　暗闇の中にしか　輝かない何かがある　と',
     'tomo-lead-3':'星は、夜空にしか輝かない',
-    'tomo-body-3':'この手記は私の痕跡だ。旅のこと、本のこと、ふとした夜中の思考のかけら<br>美しいと感じた瞬間を、言葉で捕まえようとする試み',
+    'tomo-body-3':'この刻印は魂の痕跡だ　旅　書籍　ふとした思考の断片<br>魂が何かを感じた瞬間を　此処に眠らせようとする試み',
     'tomo-lead-4':'完璧には程遠い。でも、だからこそ本物だと思っている',
-    'tomo-body-4':'暗闇の中で灯す火は、小さくていい<br>それでも、誰かの目に届くならば',
+    'tomo-body-4':'暗闇の中で灯す火は<br>小さくていい<br>それでも<br>誰かの目に届くならば',
     'footer-copy':'© 灯火 2026',
   },
   en: {
@@ -538,7 +538,7 @@ const t = {
     'hero-subtitle':'— Personal Chronicle —',
     'hero-title':'In the Dark,<br /><em>Lighting a Flame</em>',
     'hero-jp':'Thoughts & Records of Daily Life',
-    'hero-desc':'This is my personal journal — records of travels, fragments of thought, and the beautiful things I encounter each day.',
+    'hero-desc':'A place where imprints of my journey and fragments of my soul quietly rest.',
     'hero-cta':'Follow the Inscription','scroll':'Scroll',
     'posts-label':'— Chronicle —','posts-title':'Latest Inscription Log',
     'tag-1':'Inscription','title-1':'Only in Silence Can the True Voice Be Heard',
@@ -555,9 +555,9 @@ const t = {
     'tomo-lead-1':'I am Tomoshibi, the one who inscribes this journal',
     'tomo-body-1':'If you are searching for something within this darkness——',
     'tomo-lead-2':'I was always afraid of the dark',
-    'tomo-body-2':'I feared the night. When the light went out, the world seemed to show a different face.<br>But now I know — there are things that can only be seen within the darkness',
+    'tomo-body-2':'I feared the night. When the light went out, I felt as though I were being swallowed by darkness.<br>But now I know — there is something that shines only within the darkness',
     'tomo-lead-3':'Stars only shine in the night sky',
-    'tomo-body-3':'This journal is my trace. Fragments of travel, books, stray thoughts in the middle of the night.<br>An attempt to capture in words the moments I found beautiful.',
+    'tomo-body-3':'These imprints are traces of my soul. Journeys. Books. Fragments of fleeting thoughts.<br>An attempt to lay to rest here the moments when the soul felt something.',
     'tomo-lead-4':'Far from perfect. But that is exactly why I believe it is real.',
     'tomo-body-4':'The flame lit in the darkness can be small.<br>Even so, if it reaches someone\'s eyes——',
   },
@@ -566,7 +566,7 @@ const t = {
     'hero-subtitle':'— Chronique Personnelle —',
     'hero-title':"Dans l'Obscurité,<br /><em>Allumer une Flamme</em>",
     'hero-jp':'Pensées et récits du quotidien',
-    'hero-desc':'Voici mon journal personnel — récits de voyages, fragments de pensée et belles rencontres du quotidien.',
+    'hero-desc':'Un lieu où les empreintes de mon voyage et les fragments de mon âme reposent en silence.',
     'hero-cta':'Suivre l\'inscription','scroll':'Défiler',
     'posts-label':'— Chronique —','posts-title':'Dernières inscriptions',
     'tag-1':'Inscription','title-1':"Ce n'est que dans le silence que la vraie voix se fait entendre",
@@ -582,7 +582,7 @@ const t = {
     'tomo-lead-1':'Je suis Tomoshibi, celui qui inscrit ce journal',
     'tomo-body-1':'Si vous cherchez quelque chose dans cette obscurité——',
     'tomo-lead-2':"J'ai toujours eu peur de l'obscurité",
-    'tomo-body-2':"Je craignais la nuit. Quand la lumière s'éteignait, le monde semblait montrer un autre visage.<br>Mais aujourd'hui je sais — il y a des choses qu'on ne peut voir que dans l'obscurité",
+    'tomo-body-2':"Je craignais la nuit. Quand la lumière s'éteignait, j'avais l'impression d'être englouti par l'obscurité.<br>Mais aujourd'hui je sais — il y a quelque chose qui ne brille que dans l'obscurité",
     'tomo-lead-3':'Les étoiles ne brillent que dans le ciel nocturne',
     'tomo-body-3':'Ce journal est ma trace. Des fragments de voyages, de lectures, de pensées vagabondes au milieu de la nuit.<br>Une tentative de capturer en mots les instants qui m\'ont semblé beaux.',
     'tomo-lead-4':'Loin d\'être parfait. Mais c\'est précisément pourquoi je crois que c\'est authentique.',
@@ -594,7 +594,7 @@ const t = {
     'hero-subtitle':'— Crónica Personal —',
     'hero-title':'En la Oscuridad,<br /><em>Encender una Llama</em>',
     'hero-jp':'Pensamientos y registros de la vida diaria',
-    'hero-desc':'Este es mi diario personal — registros de viajes, fragmentos de pensamiento y las cosas bellas que encuentro cada día.',
+    'hero-desc':'Un lugar donde las huellas de mi camino y los fragmentos de mi alma descansan en silencio.',
     'hero-cta':'Seguir la inscripción','scroll':'Desplazar',
     'posts-label':'— Crónica —','posts-title':'Últimas inscripciones',
     'tag-1':'Inscripción','title-1':'Solo en el silencio puede escucharse la verdadera voz',
@@ -610,9 +610,9 @@ const t = {
     'tomo-lead-1':'Soy Tomoshibi, quien inscribe este diario',
     'tomo-body-1':'Si estás buscando algo dentro de esta oscuridad——',
     'tomo-lead-2':'Siempre tuve miedo de la oscuridad',
-    'tomo-body-2':'Temía la noche. Cuando se apagaba la luz, el mundo parecía mostrar otra cara.<br>Pero ahora lo sé — hay cosas que solo se pueden ver dentro de la oscuridad',
+    'tomo-body-2':'Temía la noche. Cuando se apagaba la luz, sentía que era devorado por la oscuridad.<br>Pero ahora lo sé — hay algo que solo brilla dentro de la oscuridad',
     'tomo-lead-3':'Las estrellas solo brillan en el cielo nocturno',
-    'tomo-body-3':'Este diario es mi huella. Fragmentos de viajes, libros, pensamientos dispersos en medio de la noche.<br>Un intento de capturar con palabras los momentos que encontré bellos.',
+    'tomo-body-3':'Estas huellas son las trazas de mi alma. Viajes. Libros. Fragmentos de pensamientos fugaces.<br>Un intento de hacer dormir aquí los momentos en que el alma sintió algo.',
     'tomo-lead-4':'Lejos de ser perfecto. Pero es precisamente por eso que creo que es auténtico.',
     'tomo-body-4':'La llama encendida en la oscuridad puede ser pequeña.<br>Aun así, si llega a los ojos de alguien——',
     'footer-copy':'© 2026 — Todos los derechos reservados',
@@ -622,7 +622,7 @@ const t = {
     'hero-subtitle':'— Crônica Pessoal —',
     'hero-title':'Na Escuridão,<br /><em>Acender uma Chama</em>',
     'hero-jp':'Pensamentos e registros do cotidiano',
-    'hero-desc':'Este é o meu diário pessoal — registros de viagens, fragmentos de pensamento e as coisas belas que encontro a cada dia.',
+    'hero-desc':'Um lugar onde as marcas da minha jornada e os fragmentos da minha alma repousam em silêncio.',
     'hero-cta':'Seguir a inscrição','scroll':'Rolar',
     'posts-label':'— Crônica —','posts-title':'Últimas inscrições',
     'tag-1':'Inscrição','title-1':'Somente no silêncio a verdadeira voz pode ser ouvida',
@@ -638,9 +638,9 @@ const t = {
     'tomo-lead-1':'Sou Tomoshibi, quem inscreve este diário',
     'tomo-body-1':'Se você está buscando algo dentro desta escuridão——',
     'tomo-lead-2':'Sempre tive medo do escuro',
-    'tomo-body-2':'Temia a noite. Quando a luz se apagava, o mundo parecia mostrar outra face.<br>Mas agora sei — há coisas que só podem ser vistas dentro da escuridão',
+    'tomo-body-2':'Temia a noite. Quando a luz se apagava, sentia que estava sendo engolido pela escuridão.<br>Mas agora sei — há algo que só brilha dentro da escuridão',
     'tomo-lead-3':'As estrelas só brilham no céu noturno',
-    'tomo-body-3':'Este diário é meu rastro. Fragmentos de viagens, livros, pensamentos soltos no meio da noite.<br>Uma tentativa de capturar em palavras os momentos que achei belos.',
+    'tomo-body-3':'Estas marcas são os rastros da minha alma. Viagens. Livros. Fragmentos de pensamentos passageiros.<br>Uma tentativa de fazer adormecer aqui os momentos em que a alma sentiu algo.',
     'tomo-lead-4':'Longe de ser perfeito. Mas é exatamente por isso que acredito que é genuíno.',
     'tomo-body-4':'A chama acesa na escuridão pode ser pequena.<br>Mesmo assim, se chegar aos olhos de alguém——',
     'footer-copy':'© 2026 — Todos os direitos reservados',
@@ -650,7 +650,7 @@ const t = {
     'hero-subtitle':'— व्यक्तिगत वृत्तांत —',
     'hero-title':'अंधेरे में,<br /><em>ज्योति जलाना</em>',
     'hero-jp':'दैनिक विचार और अभिलेख',
-    'hero-desc':'यह मेरी व्यक्तिगत डायरी है — यात्राओं के संस्मरण, विचारों के टुकड़े, और रोज़मर्रा में मिलने वाली सुंदर चीज़ें।',
+    'hero-desc':'यह वह स्थान है जहाँ मेरी यात्रा के निशान और मेरी आत्मा के टुकड़े चुपचाप विश्राम करते हैं।',
     'hero-cta':'शिलालेख का अनुसरण करें','scroll':'स्क्रॉल',
     'posts-label':'— वृत्तांत —','posts-title':'नवीनतम शिलालेख-वृत्त',
     'tag-1':'शिलालेख','title-1':'केवल मौन में ही सच्ची आवाज़ सुनाई देती है',
@@ -666,9 +666,9 @@ const t = {
     'tomo-lead-1':'मैं तोमोशिबि हूँ, इस डायरी का लेखक',
     'tomo-body-1':'यदि आप इस अंधेरे में कुछ खोज रहे हैं——',
     'tomo-lead-2':'मैं हमेशा अंधेरे से डरता था',
-    'tomo-body-2':'रात से डर लगता था। जब रोशनी बुझ जाती, दुनिया जैसे दूसरा रूप दिखाती।<br>पर अब जानता हूँ — कुछ चीज़ें केवल अंधेरे में ही दिखती हैं',
+    'tomo-body-2':'रात से डर लगता था। जब रोशनी बुझ जाती, लगता जैसे अंधेरे में समा जाऊँगा।<br>पर अब जानता हूँ — कुछ ऐसा है जो केवल अंधेरे में ही चमकता है',
     'tomo-lead-3':'तारे केवल रात के आकाश में चमकते हैं',
-    'tomo-body-3':'यह डायरी मेरा निशान है। सफ़र के, किताबों के, रात के अनायास विचारों के टुकड़े।<br>उन पलों को शब्दों में पकड़ने का प्रयास जो सुंदर लगे।',
+    'tomo-body-3':'ये अंकन मेरी आत्मा के निशान हैं। यात्राएँ। पुस्तकें। क्षणिक विचारों के टुकड़े।<br>उन पलों को यहाँ सुलाने का प्रयास जब आत्मा ने कुछ अनुभव किया।',
     'tomo-lead-4':'पूर्णता से कोसों दूर। पर इसीलिए असली मानता हूँ।',
     'tomo-body-4':'अंधेरे में जलाई गई लौ छोटी हो सकती है।<br>फिर भी, यदि वह किसी की आँखों तक पहुँचे——',
     'footer-copy':'© 2026 — सर्वाधिकार सुरक्षित',
@@ -678,7 +678,7 @@ const t = {
     'hero-subtitle':'— مذكرات شخصية —',
     'hero-title':'في الظلام،<br /><em>إضاءة شعلة</em>',
     'hero-jp':'أفكار وسجلات من الحياة اليومية',
-    'hero-desc':'هذه مذكراتي الشخصية — سجلات السفر، وشذرات الفكر، والأشياء الجميلة التي أجدها كل يوم.',
+    'hero-desc':'مكانٌ تنام فيه بصمات رحلتي وشذرات روحي بهدوء.',
     'hero-cta':'اتبع النقش','scroll':'مرر',
     'posts-label':'— السجل —','posts-title':'أحدث النقوش',
     'tag-1':'نقش','title-1':'في الصمت وحده تُسمع الصوت الحقيقي',
@@ -694,9 +694,9 @@ const t = {
     'tomo-lead-1':'أنا توموشيبي، من ينقش هذه اليوميات',
     'tomo-body-1':'إذا كنت تبحث عن شيء ما داخل هذا الظلام——',
     'tomo-lead-2':'كنت دائماً أخاف الظلام',
-    'tomo-body-2':'كنت أخشى الليل. حين تنطفئ الأنوار، يبدو العالم كأنه يكشف وجهاً آخر.<br>لكنني الآن أعرف — ثمة أشياء لا تُرى إلا في الظلام',
+    'tomo-body-2':'كنت أخشى الليل. حين تنطفئ الأنوار، كأنني كنت أُبتلع في الظلام.<br>لكنني الآن أعرف — ثمة شيء لا يتألق إلا في الظلام',
     'tomo-lead-3':'النجوم لا تتلألأ إلا في سماء الليل',
-    'tomo-body-3':'هذه اليوميات أثري في الوجود. شذرات من أسفار وكتب وأفكار عشوائية في منتصف الليل.<br>محاولة لالتقاط اللحظات الجميلة بالكلمات.',
+    'tomo-body-3':'هذه النقوش آثار روحي. أسفار. كتب. شذرات من أفكار عابرة.<br>محاولة لإنامة اللحظات التي شعرت فيها الروح بشيء، هنا.',
     'tomo-lead-4':'بعيد عن الكمال. لكن هذا بالضبط ما يجعله حقيقياً.',
     'tomo-body-4':'الشعلة التي تُضاء في الظلام يمكن أن تكون صغيرة.<br>ومع ذلك، إذا وصلت إلى عيون أحدهم——',
     'footer-copy':'© 2026 — جميع الحقوق محفوظة',
@@ -706,7 +706,7 @@ const t = {
     'hero-subtitle':'— ব্যক্তিগত বৃত্তান্ত —',
     'hero-title':'অন্ধকারে,<br /><em>আলো জ্বালানো</em>',
     'hero-jp':'দৈনন্দিন ভাবনা ও অভিলেখ',
-    'hero-desc':'এটি আমার ব্যক্তিগত ডায়েরি — ভ্রমণের স্মৃতি, চিন্তার টুকরো, এবং প্রতিদিনের জীবনে মেলা সুন্দর জিনিসগুলো।',
+    'hero-desc':'এ সেই স্থান যেখানে আমার যাত্রার ছাপ এবং আমার আত্মার টুকরোগুলো নীরবে ঘুমিয়ে আছে।',
     'hero-cta':'শিলালিপি অনুসরণ করুন','scroll':'স্ক্রোল',
     'posts-label':'— বৃত্তান্ত —','posts-title':'সর্বশেষ শিলালিপি',
     'tag-1':'শিলালিপি','title-1':'কেবল নীরবতায় প্রকৃত কণ্ঠস্বর শোনা যায়',
@@ -722,9 +722,9 @@ const t = {
     'tomo-lead-1':'আমি তোমোশিবি, এই ডায়েরির লেখক',
     'tomo-body-1':'যদি আপনি এই অন্ধকারের মধ্যে কিছু খুঁজছেন——',
     'tomo-lead-2':'আমি সবসময় অন্ধকারকে ভয় পেতাম',
-    'tomo-body-2':'রাতকে ভয় লাগত। আলো নিভলে মনে হত পৃথিবী অন্য রূপ ধারণ করেছে।<br>কিন্তু এখন জানি — কিছু জিনিস শুধু অন্ধকারের ভেতরেই দেখা যায়',
+    'tomo-body-2':'রাতকে ভয় লাগত। আলো নিভলে মনে হত আমি অন্ধকারে গ্রাস হয়ে যাচ্ছি।<br>কিন্তু এখন জানি — এমন কিছু আছে যা শুধু অন্ধকারেই জ্বলে',
     'tomo-lead-3':'তারারা শুধু রাতের আকাশেই জ্বলে',
-    'tomo-body-3':'এই ডায়েরি আমার চিহ্ন। ভ্রমণ, বই, মাঝরাতের ভাবনার টুকরো।<br>সুন্দর মনে হওয়া মুহূর্তগুলো শব্দে ধরার চেষ্টা।',
+    'tomo-body-3':'এই ছাপগুলো আমার আত্মার চিহ্ন। যাত্রা। বই। ক্ষণস্থায়ী ভাবনার টুকরো।<br>যে মুহূর্তে আত্মা কিছু অনুভব করেছিল, তা এখানে ঘুম পাড়ানোর চেষ্টা।',
     'tomo-lead-4':'নিখুঁত থেকে অনেক দূরে। কিন্তু তাই বলেই সত্যি মনে করি।',
     'tomo-body-4':'অন্ধকারে জ্বালানো আলো ছোট হতে পারে।<br>তবুও, যদি কারো চোখে পৌঁছায়——',
     'footer-copy':'© 2026 — সর্বস্বত্ব সংরক্ষিত',
@@ -734,7 +734,7 @@ const t = {
     'hero-subtitle':'— Личная хроника —',
     'hero-title':'Во тьме<br /><em>зажечь огонь</em>',
     'hero-jp':'Мысли и записи повседневной жизни',
-    'hero-desc':'Это мой личный дневник — записи о путешествиях, фрагменты мыслей и красивые вещи, встреченные в ежедневной жизни.',
+    'hero-desc':'Место, где отпечатки моего пути и осколки моей души тихо покоятся.',
     'hero-cta':'Следовать надписи','scroll':'Прокрутить',
     'posts-label':'— Хроника —','posts-title':'Последние надписи',
     'tag-1':'Надпись','title-1':'Только в тишине можно услышать настоящий голос',
@@ -750,9 +750,9 @@ const t = {
     'tomo-lead-1':'Я — Томосиби, тот, кто вписывает эти записи',
     'tomo-body-1':'Если вы ищете что-то в этой темноте——',
     'tomo-lead-2':'Я всегда боялся темноты',
-    'tomo-body-2':'Я боялся ночи. Когда свет гас, мир словно показывал другое лицо.<br>Но теперь я знаю — есть вещи, которые видны только во тьме',
+    'tomo-body-2':'Я боялся ночи. Когда свет гас, казалось, тьма поглощает меня.<br>Но теперь я знаю — есть нечто, что сияет только во тьме',
     'tomo-lead-3':'Звёзды светят лишь в ночном небе',
-    'tomo-body-3':'Этот дневник — мой след. Обрывки из путешествий, книг, случайных мыслей посреди ночи.<br>Попытка поймать словами мгновения, которые я нашёл прекрасными.',
+    'tomo-body-3':'Эти отпечатки — следы моей души. Путешествия. Книги. Обрывки мимолётных мыслей.<br>Попытка упокоить здесь мгновения, когда душа что-то почувствовала.',
     'tomo-lead-4':'Далеко от совершенства. Но именно поэтому я считаю это настоящим.',
     'tomo-body-4':'Огонь, зажжённый во тьме, может быть маленьким.<br>И всё же, если он достигнет чьих-то глаз——',
     'footer-copy':'© 2026 — Все права защищены',
@@ -762,7 +762,7 @@ const t = {
     'hero-subtitle':'— Catatan Pribadi —',
     'hero-title':'Di Balik Kegelapan,<br /><em>Menyalakan Api</em>',
     'hero-jp':'Pikiran dan catatan kehidupan sehari-hari',
-    'hero-desc':'Ini adalah jurnal pribadi saya — catatan perjalanan, serpihan pikiran, dan hal-hal indah yang saya temui setiap hari.',
+    'hero-desc':'Tempat di mana jejak perjalananku dan serpihan jiwaku beristirahat dengan tenang.',
     'hero-cta':'Ikuti prasasti','scroll':'Gulir',
     'posts-label':'— Kronik —','posts-title':'Prasasti Terbaru',
     'tag-1':'Prasasti','title-1':'Hanya dalam Keheningan Suara Sejati Dapat Terdengar',
@@ -778,9 +778,9 @@ const t = {
     'tomo-lead-1':'Saya Tomoshibi, yang mengukir jurnal ini',
     'tomo-body-1':'Jika kamu mencari sesuatu di dalam kegelapan ini——',
     'tomo-lead-2':'Saya selalu takut pada kegelapan',
-    'tomo-body-2':'Saya takut malam. Saat cahaya padam, dunia seolah menampilkan wajah berbeda.<br>Tapi kini saya tahu — ada hal-hal yang hanya bisa dilihat dalam kegelapan',
+    'tomo-body-2':'Saya takut malam. Saat cahaya padam, seolah aku akan ditelan oleh kegelapan.<br>Tapi kini saya tahu — ada sesuatu yang hanya bersinar dalam kegelapan',
     'tomo-lead-3':'Bintang hanya bersinar di langit malam',
-    'tomo-body-3':'Jurnal ini adalah jejakku. Serpihan perjalanan, buku, pikiran acak di tengah malam.<br>Upaya untuk menangkap dalam kata-kata momen-momen yang kutemukan indah.',
+    'tomo-body-3':'Ukiran-ukiran ini adalah jejak jiwaku. Perjalanan. Buku. Serpihan pikiran yang berlalu.<br>Upaya untuk menidurkan di sini momen-momen ketika jiwa merasakan sesuatu.',
     'tomo-lead-4':'Jauh dari sempurna. Tapi justru itulah mengapa saya percaya ini nyata.',
     'tomo-body-4':'Api yang dinyalakan dalam kegelapan bisa saja kecil.<br>Meski begitu, jika ia sampai di mata seseorang——',
     'footer-copy':'© 2026 — Semua hak dilindungi',
@@ -790,7 +790,7 @@ const t = {
     'hero-subtitle':'— Persönliche Chronik —',
     'hero-title':'Im Dunkel<br /><em>ein Licht entfachen</em>',
     'hero-jp':'Gedanken und Aufzeichnungen des Alltags',
-    'hero-desc':'Dies ist mein persönliches Tagebuch — Reiseberichte, Gedankensplitter und die schönen Dinge, die mir täglich begegnen.',
+    'hero-desc':'Ein Ort, wo die Spuren meiner Reise und die Fragmente meiner Seele still ruhen.',
     'hero-cta':'Der Inschrift folgen','scroll':'Scrollen',
     'posts-label':'— Chronik —','posts-title':'Neueste Inschriften',
     'tag-1':'Inschrift','title-1':'Nur in der Stille ist die wahre Stimme zu hören',
@@ -806,9 +806,9 @@ const t = {
     'tomo-lead-1':'Ich bin Tomoshibi, derjenige, der dieses Tagebuch beschreibt',
     'tomo-body-1':'Wenn du in dieser Dunkelheit nach etwas suchst——',
     'tomo-lead-2':'Ich hatte immer Angst vor der Dunkelheit',
-    'tomo-body-2':'Ich fürchtete die Nacht. Wenn das Licht erlosch, schien die Welt ein anderes Gesicht zu zeigen.<br>Doch heute weiß ich — es gibt Dinge, die man nur in der Dunkelheit sehen kann',
+    'tomo-body-2':'Ich fürchtete die Nacht. Wenn das Licht erlosch, hatte ich das Gefühl, von der Dunkelheit verschluckt zu werden.<br>Doch heute weiß ich — es gibt etwas, das nur in der Dunkelheit leuchtet',
     'tomo-lead-3':'Sterne leuchten nur am Nachthimmel',
-    'tomo-body-3':'Dieses Tagebuch ist meine Spur. Bruchstücke von Reisen, Büchern, nächtlichen Gedanken.<br>Der Versuch, Augenblicke der Schönheit in Worte zu fassen.',
+    'tomo-body-3':'Diese Einprägungen sind Spuren meiner Seele. Reisen. Bücher. Fragmente flüchtiger Gedanken.<br>Der Versuch, die Augenblicke, in denen die Seele etwas spürte, hier zur Ruhe zu betten.',
     'tomo-lead-4':'Weit von Perfektion entfernt. Aber genau deshalb glaube ich, dass es echt ist.',
     'tomo-body-4':'Die Flamme, die in der Dunkelheit entzündet wird, darf klein sein.<br>Wenn sie dennoch jemandes Augen erreicht——',
     'footer-copy':'© 2026 — Alle Rechte vorbehalten',
@@ -818,7 +818,7 @@ const t = {
     'hero-subtitle':'— Osobista Kronika —',
     'hero-title':'W Ciemności<br /><em>Zapalić Światło</em>',
     'hero-jp':'Myśli i zapiski z codziennego życia',
-    'hero-desc':'To mój osobisty dziennik — wspomnienia z podróży, fragmenty myśli i piękne rzeczy, które spotykam każdego dnia.',
+    'hero-desc':'Miejsce, gdzie ślady mojej podróży i okruchy mojej duszy spokojnie spoczywają.',
     'hero-cta':'Podążaj za inskrypcją','scroll':'Przewiń',
     'posts-label':'— Kronika —','posts-title':'Najnowsze inskrypcje',
     'tag-1':'Inskrypcja','title-1':'Tylko w ciszy można usłyszeć prawdziwy głos',
@@ -834,9 +834,9 @@ const t = {
     'tomo-lead-1':'Jestem Tomoshibi, ten, który zapisuje ten dziennik',
     'tomo-body-1':'Jeśli szukasz czegoś w tej ciemności——',
     'tomo-lead-2':'Zawsze bałem się ciemności',
-    'tomo-body-2':'Bałem się nocy. Gdy gasło światło, świat zdawał się pokazywać inną twarz.<br>Ale teraz wiem — są rzeczy, które można zobaczyć tylko w ciemności',
+    'tomo-body-2':'Bałem się nocy. Gdy gasło światło, czułem, jakby ciemność mnie pochłaniała.<br>Ale teraz wiem — jest coś, co świeci tylko w ciemności',
     'tomo-lead-3':'Gwiazdy błyszczą tylko na nocnym niebie',
-    'tomo-body-3':'Ten dziennik jest moim śladem. Fragmenty podróży, książek, przypadkowych myśli w środku nocy.<br>Próba uchwycenia w słowach chwil, które uznałem za piękne.',
+    'tomo-body-3':'Te ślady są śladami mojej duszy. Podróże. Książki. Fragmenty ulotnych myśli.<br>Próba uśpienia tutaj chwil, w których dusza coś poczuła.',
     'tomo-lead-4':'Daleki od doskonałości. Ale właśnie dlatego uważam, że jest prawdziwy.',
     'tomo-body-4':'Płomień zapalony w ciemności może być mały.<br>Nawet tak, jeśli dotrze do czyichś oczu——',
     'footer-copy':'© 2026 — Wszelkie prawa zastrzeżone',
@@ -846,7 +846,7 @@ const t = {
     'hero-subtitle':'— 개인 기록 —',
     'hero-title':'어둠 속에서,<br /><em>빛을 밝히다</em>',
     'hero-jp':'일상의 사유와 기록',
-    'hero-desc':'이것은 나의 개인 일기 — 여행의 기록, 단상의 파편, 그리고 일상에서 만난 아름다운 순간들.',
+    'hero-desc':'나의 여정의 흔적과 영혼의 조각들이 고요히 잠드는 곳.',
     'hero-cta':'각인을 따라가다','scroll':'스크롤',
     'posts-label':'— 연대기 —','posts-title':'최근 각인록',
     'tag-1':'각인','title-1':'공기의 냄새가, 여름으로 바뀌었다',
@@ -864,9 +864,9 @@ const t = {
     'tomo-lead-1':'이 일기의 기록자, 등불（ともしび）이라고 합니다',
     'tomo-body-1':'이 어둠 속에서 무언가를 찾고 있다면——',
     'tomo-lead-2':'어둠을, 줄곧 두려워했다',
-    'tomo-body-2':'밤이 무서웠다. 빛이 꺼지면 세상이 다른 얼굴을 보여주는 것 같아서.<br>하지만 이제는 안다 — 어둠 속에서만 보이는 것이 있다',
+    'tomo-body-2':'밤이 무서웠다. 빛이 꺼지면 어둠에 삼켜지는 것 같아서.<br>하지만 이제는 안다 — 어둠 속에서만 빛나는 무언가가 있다',
     'tomo-lead-3':'별은, 밤하늘에서만 빛난다',
-    'tomo-body-3':'이 일기는 나의 흔적이다. 여행, 책, 문득 떠오른 한밤의 단상들의 파편.<br>아름답다고 느낀 순간을 말로 붙잡으려는 시도.',
+    'tomo-body-3':'이 刻印들은 내 영혼의 흔적이다. 여행. 서적. 스쳐지나간 생각의 단편들.<br>영혼이 무언가를 느낀 순간을 이곳에 잠들게 하려는 시도.',
     'tomo-lead-4':'완벽과는 거리가 멀다. 하지만, 그렇기에 진짜라고 생각한다.',
     'tomo-body-4':'어둠 속에서 밝히는 불은, 작아도 된다.<br>그래도, 누군가의 눈에 닿는다면——',
     'footer-copy':'© 灯火 2026 — 모든 권리 보유',
@@ -876,7 +876,7 @@ const t = {
     'hero-subtitle':'— 个人记事 —',
     'hero-title':'在黑暗中，<br /><em>点燃一道光</em>',
     'hero-jp':'日常思绪与记录',
-    'hero-desc':'这是我的私人日记——旅途记录、思想碎片，以及日常中遇见的美好瞬间。',
+    'hero-desc':'这是我旅途的刻印与灵魂碎片静静沉眠之地。',
     'hero-cta':'追随刻印','scroll':'滚动',
     'posts-label':'— 编年史 —','posts-title':'最新刻印录',
     'tag-1':'刻印','title-1':'空气的气味，变成了夏天',
@@ -894,9 +894,9 @@ const t = {
     'tomo-lead-1':'这本日记的记录者，灯火（ともしび）',
     'tomo-body-1':'如果你在这黑暗之中寻找什么——',
     'tomo-lead-2':'我一直害怕黑暗',
-    'tomo-body-2':'害怕夜晚。灯光熄灭时，世界似乎会露出另一张脸。<br>但现在我知道了 — 有些东西只有在黑暗中才能看见',
+    'tomo-body-2':'害怕夜晚。灯光熄灭时，感觉像要被黑暗吞噬。<br>但现在我知道了 — 有些东西只有在黑暗中才能闪耀',
     'tomo-lead-3':'星星，只在夜空中闪耀',
-    'tomo-body-3':'这本日记是我的痕迹。旅途、书籍、深夜偶然浮现的思绪碎片。<br>试图用文字捕捉那些觉得美丽的瞬间。',
+    'tomo-body-3':'这些刻印是灵魂的痕迹。旅途。书籍。转瞬即逝的思绪碎片。<br>试图将灵魂有所感触的瞬间，在此处安眠。',
     'tomo-lead-4':'远非完美。但正因如此，我认为它是真实的。',
     'tomo-body-4':'在黑暗中点燃的火，可以很小。<br>即便如此，如果能触达某人的眼睛——',
     'footer-copy':'© 灯火 2026 — 版权所有',
@@ -906,7 +906,7 @@ const t = {
     'hero-subtitle':'— 個人記事 —',
     'hero-title':'在黑暗裏，<br /><em>點亮一道光</em>',
     'hero-jp':'日常思緒與記錄',
-    'hero-desc':'呢本係我嘅私人日記——旅途記錄、思想碎片，同埋日常中遇見嘅美好瞬間。',
+    'hero-desc':'呢度係我旅途嘅刻印同靈魂碎片靜靜沉睡嘅地方。',
     'hero-cta':'追隨刻印','scroll':'滾動',
     'posts-label':'— 編年史 —','posts-title':'最新刻印錄',
     'tag-1':'刻印','title-1':'空氣嘅氣味，變成咗夏天',
@@ -924,9 +924,9 @@ const t = {
     'tomo-lead-1':'呢本日記嘅記錄者，燈火（ともしび）',
     'tomo-body-1':'如果你喺呢個黑暗之中搵緊啲嘢——',
     'tomo-lead-2':'我一直都怕黑',
-    'tomo-body-2':'好驚夜晚。熄燈之後，世界似乎會露出另一張臉。<br>但係而家我知道喇 — 有啲嘢只有喺黑暗中先至見得到',
+    'tomo-body-2':'好驚夜晚。熄燈之後，感覺似乎被黑暗吞噬。<br>但係而家我知道喇 — 有啲嘢只有喺黑暗中先至發光',
     'tomo-lead-3':'星星，只喺夜空中閃耀',
-    'tomo-body-3':'呢本日記係我嘅痕跡。旅途、書籍、深夜偶然浮現嘅思緒碎片。<br>試圖用文字捕捉嗰啲覺得美麗嘅瞬間。',
+    'tomo-body-3':'呢啲刻印係靈魂嘅痕跡。旅途。書籍。轉瞬即逝嘅思緒碎片。<br>試圖將靈魂有所感觸嘅瞬間，喺此處安眠。',
     'tomo-lead-4':'遠非完美。但正因如此，我認為佢係真實嘅。',
     'tomo-body-4':'喺黑暗中點燃嘅火，可以好細。<br>即使咁，如果能觸達某人嘅眼睛——',
     'footer-copy':'© 燈火 2026 — 版權所有',
@@ -1839,3 +1839,9 @@ setLanguage(currentLang);
 </script>
 </body>
 </html>
+
+
+
+
+
+
