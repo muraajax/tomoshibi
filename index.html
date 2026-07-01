@@ -1088,6 +1088,33 @@ function setLanguage(lang) {
     }
   } catch(e) {}
   document.dispatchEvent(new CustomEvent('langchange', {detail: lang}));
+  buildTomoLines();
+}
+
+// tomo-content 2枚目以降の本文を<br>単位で個別行要素に分割する
+function buildTomoLines() {
+  document.querySelectorAll('.tomo-content').forEach((c, i) => {
+    if (i === 0) return;
+    c.querySelectorAll('[data-tomo-gen]').forEach(el => el.remove());
+    const lead = c.querySelector('p.tomo-lead');
+    if (lead && !lead.hasAttribute('data-tomo-lead-line')) lead.setAttribute('data-tomo-lead-line', '');
+    const body = c.querySelector('p.tomo-body');
+    if (body) {
+      body.style.display = 'none';
+      body.innerHTML.split(/<br\s*\/?>/i).map(s => s.trim()).filter(Boolean).forEach(html => {
+        const p = document.createElement('p');
+        p.className = 'tomo-body';
+        p.setAttribute('data-tomo-gen', '');
+        p.innerHTML = html;
+        c.appendChild(p);
+      });
+    }
+    // 旧per行アニメーションの残留インラインスタイルをリセット
+    c.querySelectorAll('[data-tomo-lead-line],[data-tomo-gen]').forEach(el => {
+      el.style.transform = '';
+      el.style.opacity = '';
+    });
+  });
 }
 
 /* ── Lang Picker ── */
@@ -1198,20 +1225,32 @@ document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
     }
     if (scrolled >= totalScroll) return;
 
-    const progress = scrolled / totalScroll;
-    const sceneF = progress * N;
+    const sceneF = Math.min((scrolled / totalScroll) * N, N);
     const scene = Math.min(Math.floor(sceneF), N - 1);
     const localP = sceneF - scene;
 
     contents.forEach((c,i) => {
       if (i === scene) {
         c.style.display = 'block';
-        const ty = localP * vh * -1.15;
-        const op = localP < 0.6 ? 1 : Math.max(0, 1 - (localP - 0.6) / 0.4);
-        c.style.transform = `translateY(${ty}px)`;
-        c.style.opacity = String(op);
+        if (scene === 0) {
+          // 1枚目: ブロック全体を下から上へ（変更なし）
+          const ty = localP * vh * -1.15;
+          const op = localP < 0.6 ? 1 : Math.max(0, 1 - (localP - 0.6) / 0.4);
+          c.style.transform = `translateY(${ty}px)`;
+          c.style.opacity = String(op);
+        } else {
+          // 2枚目以降: リード行が画面下端から現れ上へサーっと流れる
+          const h = c.offsetHeight;        // コンテナ高さ（リード行が下端に来るオフセット算出用）
+          const ty0 = 80 + h;              // localP=0: リード行のtopが画面下端
+          const ty = ty0 + localP * (-ty0 - 1.15 * vh);
+          const op = localP < 0.75 ? 1 : Math.max(0, 1 - (localP - 0.75) / 0.25);
+          c.style.transform = `translateY(${ty}px)`;
+          c.style.opacity = String(op);
+        }
       } else {
         c.style.display = 'none';
+        c.style.transform = 'translateY(0)';
+        c.style.opacity = '0';
       }
     });
 
